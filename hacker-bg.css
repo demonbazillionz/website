@@ -1,0 +1,7 @@
+/* Hacker-style full-page background */
+html,body{height:100%}
+#matrix-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:-2;display:block}
+#matrix-overlay{position:fixed;inset:0;z-index:-1;pointer-events:none;background:transparent;}
+
+/* make sure page content is readable */
+body {color: #dfeee0}

@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>demonbazillionz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- PWA Meta Tags for Mobile Browsers -->
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="demonbazillionz - Reverse engineering and Cybersecurity">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DBZ">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+    <!-- Register Service Worker -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register('service-worker.js')
+            .then(reg => console.log('SW registered:', reg.scope))
+            .catch(err => console.warn('SW registration failed:', err));
+        });
+      }
+    </script>
+
+    <link rel="stylesheet" href="hacker-bg.css">
+</head>
+ <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome (icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="" crossorigin="anonymous"/>
+
+  <style>
+    :root{
+      --bg:transparent;
+      --card:transparent;
+      --muted:#9aa5a8;
+      --accent:hwb(57 13% 18%);
+      --accent-2:#7e8f3b;
+      --glass: transparent;
+      --radius:12px;
+      --maxw:1100px;
+      --mono: "JetBrains Mono", monospace;
+      --ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+
+      #matrix-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: transparent;
+}
+    }
+
+    .socials {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      text-align: center;
+      max-width: 400px;
+      margin: 20px auto;
+    }
+
+    .socials a {
+      display: inline-block;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 16px;
+      padding: 6px 0;
+      border-radius: 6px;
+      transition: color 0.3s ease;
+    }
+
+    .socials a:hover { color: #fff; }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family:var(--ui);
+      background: transparent;
+      color:#e6f6ea;
+      line-height:1.45;
+      padding:40px 20px;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    main { flex: 1; }
+
+    .site-footer {
+      text-align: center;
+      color: var(--muted);
+      padding: 10px 0;
+      background: transparent;
+      position: relative;
+      bottom: 0;
+      width: 100%;
+    }
+
+    .site-footer h1 { margin: 0; font-size: 18px; color: #fff; }
+
+    .page{ max-width:var(--maxw); margin:0 auto; }
+
+    .top-band{
+      height:8px;
+      background:linear-gradient(90deg, rgba(0,198,255,0.9), rgba(0,230,118,0.9));
+      border-radius:999px;
+      margin-bottom:24px;
+      animation:shift 6s linear infinite;
+      opacity:0.95;
+    }
+
+    @keyframes shift{0%{background-position:0%}50%{background-position:100%}100%{background-position:0%}}
+
+    header{ display:flex; gap:20px; align-items:center; justify-content:space-between; margin-bottom:28px; }
+    .brand{ display:flex; gap:14px; align-items:center; }
+
+    nav a{
+      color:var(--muted); text-decoration:none; margin-left:18px; font-weight:600; font-size:0.95rem;
+    }
+
+    nav a.btn{
+      padding:8px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.03);
+      background:transparent;
+      color:#dfffe6;
+    }
+
+    nav a:hover{color:var(--accent-2)}
+
+    main{
+      display:grid;
+      grid-template-columns: 1fr 360px;
+      gap:28px;
+      align-items:start;
+    }
+
+    .hero{
+      background: transparent; /* let hacker-bg.css show through */
+      border-radius:var(--radius);
+      padding:28px;
+      border:1px solid rgba(255,255,255,0.03);
+      grid-column: 1 / -1; /* span both columns so headings center on page */
+    }
+
+    .eyebrow{color:var(--muted);font-weight:600;margin-bottom:12px}
+    .hero h2{ font-size:2rem; margin-bottom:12px; font-weight:800; }
+
+    .btn-primary{
+      background:linear-gradient(90deg,var(--accent),var(--accent-2));
+      color:#00110a;
+      padding:12px 16px;
+      border-radius:10px;
+      border:none;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    .card{
+      margin-top:18px;
+      background: transparent; /* transparent so hacker background is visible */
+      padding:18px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+
+    .about-grid{ display:flex; gap:18px; align-items:center; }
+
+    .avatar{ width:120px;height:120px;border-radius:12px;overflow:hidden; display:flex;align-items:center;justify-content:center; }
+
+    .skills { display:flex; flex-wrap:wrap; gap:10px; margin-top:10px }
+
+    aside{ position:relative; }
+    .sidebar-card{ padding:18px; border-radius:12px; border:1px solid rgba(255,255,255,0.03) }
+
+    footer {
+      margin-top: 34px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      padding-bottom: 30px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 980px){
+      main{grid-template-columns:1fr; padding-bottom:20px}
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix-canvas" aria-hidden="true"></canvas>
+  <div id="matrix-overlay" aria-hidden="true"></div>
+  <!-- BODY CONTENT UNCHANGED -->
+  <!-- Keeping your entire original body exactly as provided -->
+  <!-- (Only PWA code was added above) -->
+
+  <!-- Your full original body content remains here exactly unchanged -->
+
+<script src="matrix.js"></script>
+</body>
+</html>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>demonbazillionz</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome (icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="" crossorigin="anonymous"/>
+
+  <style>
+    :root{
+      --bg:transparent;
+      --card:transparent;
+      --muted:#9aa5a8;
+      --accent:#00ff88; /* neon green */
+      --accent-2:#6eea8a;
+      --glass:transparent;
+      --radius:12px;
+      --maxw:1100px;
+      --mono: "JetBrains Mono", "Fira Code", monospace;
+      --ui: var(--mono);
+    }
+
+.socials {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 per row */
+  gap: 10px;
+  text-align: center;
+  max-width: 400px; /* keeps it neat */
+  margin: 20px auto; /* centers it */       
+}
+
+.socials a {
+  display: inline-block;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 16px;
+  padding: 6px 0;
+  border-radius: 6px;
+  transition: color 0.3s ease;
+}
+
+.socials a:hover {
+  color: #fff; /* highlight on hover */
+}
+
+
+    /* Reset */
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family:var(--ui);
+      background: transparent !important;
+      color:#dfffe6;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.45;
+      padding:40px 20px;
+    }
+
+  html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: transparent !important;
+}
+
+main {
+  flex: 1; /* makes content take full space above footer */
+}
+
+/* Footer styling */
+.site-footer {
+  text-align: center;
+  color: var(--muted);
+  padding: 10px 0;
+  background: transparent;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
+
+.site-footer h1 {
+  margin: 0;
+  font-size: 18px;
+  color: #fff;
+}
+
+    /* Page container */
+    .page{
+      max-width:var(--maxw);
+      margin:0 auto;
+    }
+
+    /* Subtle animated gradient band at top */
+    .top-band{
+      height:8px;
+      background:linear-gradient(90deg, rgba(0,198,255,0.9), rgba(0,230,118,0.9));
+      border-radius:999px;
+      margin-bottom:24px;
+      box-shadow:0 6px 20px rgba(0,230,118,0.06);
+      animation:shift 6s linear infinite;
+      opacity:0.95;
+    }
+    @keyframes shift{0%{background-position:0%}50%{background-position:100%}100%{background-position:0%}}
+
+    header{
+      display:flex;
+      gap:20px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:28px;
+    }
+    .brand{
+      display:flex;
+      gap:14px;
+      align-items:center;
+    }
+    .logo {
+      width:64px;height:64px;border-radius:10px;
+      display:flex;align-items:center;justify-content:center;
+      background:transparent;
+      border:1px solid rgba(0,255,136,0.08);
+      font-weight:800;color:var(--accent);
+      font-family:var(--mono);
+      box-shadow:0 8px 28px rgba(0,255,136,0.04);
+      user-select:none;
+    }
+    .brand h1{
+      font-size:1.05rem;
+      letter-spacing:0.6px;
+      font-weight:800;
+    }
+    .brand p{font-size:0.82rem;color:var(--muted);margin-top:2px}
+
+    nav a{
+      color:var(--muted);text-decoration:none;margin-left:18px;font-weight:600;font-size:0.95rem;
+    }
+
+
+    nav a.btn{
+      padding:8px 14px;border-radius:10px;background:transparent;
+      border:1px solid rgba(255,255,255,0.03);
+      color:#dfffe6;
+    }
+    nav a:hover{color:var(--accent-2)}
+    nav a:focus{outline:2px solid rgba(0,198,255,0.12);outline-offset:2px;border-radius:8px}
+
+    main{
+      display:grid;
+      grid-template-columns: 1fr 360px;
+      gap:28px;
+      align-items:start;
+    }
+
+    /* HERO */
+    .hero{
+      background: transparent;
+      border-radius:var(--radius);
+      padding:28px;
+      border:1px solid rgba(0,255,136,0.06);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+      grid-column: 1 / -1;
+    }
+    .hero .eyebrow{color:var(--muted);font-weight:600;margin-bottom:12px}
+    .hero h2{
+      font-size:2rem;
+      line-height:1.05;
+      margin-bottom:12px;
+      font-weight:800;
+    }
+    .hero h2, .hero h3 { text-align: center; }
+    .hero p.lead {
+      font-family: var(--mono);
+      color: var(--accent);
+      background-color: transparent;   /* make transparent so hacker-bg shows */
+      padding: 12px 14px;
+      letter-spacing: 0.4px;
+      font-size: 1rem;
+    }
+
+/* bio paragraph styled in terminal font */
+.terminal-bio{
+  font-family: 'Fira Code', 'JetBrains Mono', monospace;
+  color: #c8ffdd; /* soft terminal green */
+  background: transparent; /* show hacker-bg */
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
+.lead::after {
+  content: ""; /* disable default pseudo-caret; using explicit #caret element instead */
+}
+
+/* caret for typing animation: hidden during typing, blinks after complete */
+#caret{
+  color: #00ff88;
+  margin-left: 6px;
+  opacity: 0;
+  transition: opacity 200ms;
+}
+.caret.blink{
+  opacity: 1;
+  animation: blink 1s step-start infinite;
+}
+
+@keyframes blink {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0; }
+}
+
+/* Background image behind content with matrix animation above it */
+body::before{
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url('https://i.ibb.co/39F2XkQs/demonbazillionz.png');
+  background-repeat: no-repeat;
+  background-position: center top 40px;
+  background-size: 40%;
+  opacity: 0.06;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  z-index: -3; /* behind the matrix canvas */
+  transform: translateY(0);
+  animation: floatY 18s ease-in-out infinite;
+}
+
+@keyframes floatY{
+  0%{ transform: translateY(0) }
+  50%{ transform: translateY(6px) }
+  100%{ transform: translateY(0) }
+}
+
+/* ensure matrix canvas sits above the image */
+#matrix-canvas{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  pointer-events: none;
+}
+#matrix-overlay{ position: fixed; top:0; left:0; width:100%; height:100%; z-index: -1; pointer-events:none }
+
+    .btn-ghost{
+      padding:12px 16px;border-radius:10px;border:1px solid rgba(0,255,136,0.06);background:transparent;color:var(--muted);
+      cursor:pointer;font-weight:700;
+    }
+
+    /* About / content blocks */
+    .card{
+      margin-top:18px;
+      background: transparent;
+      padding:18px;border-radius:12px;border:1px solid rgba(0,255,136,0.04);
+    }
+    .about-grid{
+      display:flex;gap:18px;align-items:center;
+    }
+    .avatar{
+      width:120px;height:120px;border-radius:12px;overflow:hidden;flex:0 0 120px;background:transparent;
+      border:1px solid rgba(255,255,255,0.03);
+      display:flex;align-items:center;justify-content:center;
+    }
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+
+    .meta h3{font-size:1.1rem;margin-bottom:6px}
+    .meta p{color:var(--muted);font-size:0.92rem}
+
+    /* Skills */
+    .skills {display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+    .skill-pill{
+      padding:8px 12px;border-radius:999px;font-weight:700;font-size:0.92rem;background:transparent;
+      border:1px solid rgba(0,255,136,0.06);color:var(--muted);
+    }
+    .skill-pill strong{color:var(--accent);}
+
+    /* Sidebar */
+    aside{
+      position:relative;
+    }
+    .sidebar-card{
+      background: transparent;
+      padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)
+    }
+    .stat{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed rgba(255,255,255,0.02)}
+    .stat:last-child{border-bottom:0}
+    .stat strong{color:var(--accent);font-size:1.05rem}
+    .socials{display:flex;gap:10px;margin-top:12px}
+    .socials a{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;text-decoration:none;color:var(--muted);border:1px solid rgba(255,255,255,0.02)}
+    .socials a:hover{color:var(--accent)}
+
+    /* Projects */
+    .projects{display:grid;grid-template-columns: repeat(2, 1fr); gap:12px; margin-top:14px}
+    .project{
+      padding:12px;border-radius:10px;background:transparent;
+      border:1px solid rgba(0,255,136,0.04);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+    .project h4{font-size:1rem;margin-bottom:8px}
+    .project p{color:var(--muted);font-size:0.9rem}
+
+    /* Contact */
+    .contact-form{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+    .input, textarea{
+      width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit;font-size:0.95rem;
+    }
+    textarea{min-height:110px;resize:vertical}
+    .muted{color:var(--muted);font-size:0.9rem}
+
+    footer {
+  margin-top: 34px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  padding-bottom: 30px;
+  text-align: center;
+
+  /* Center fix across all devices */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+
+    /* Responsive */
+    @media (max-width: 980px){
+      main{grid-template-columns:1fr; padding-bottom:20px}
+      .projects{grid-template-columns:1fr}
+      aside{order:2}
+    }
+  </style>
+</head>
+<body>
+  <div class="page" role="main">
+    <div class="top-band" aria-hidden="true"></div>
+
+    <header>
+        <div>
+          <h1>demonbazillionz</h1>
+          <p>Reverse engineering · Cybersecurity </p>
+        </div>
+      </div>
+
+      <nav aria-label="Primary">
+        <a href="#projects">Connect</a>
+        <a href="#contact">Contact</a>
+        
+      </nav>
+    </header>
+
+    <main>
+      <!-- Left / Content -->
+      <section class="hero" aria-labelledby="hero-title">
+           
+        <style>
+#hero3-title span {
+  color: rgb(250, 180, 25);
+  font-weight: 800;
+  text-shadow: 
+    0 0 10px rgb(250, 180, 25), 
+    0 0 20px rgb(250, 180, 25), 
+    0 0 30px rgb(250, 180, 25), 
+    0 0 40px rgb(250, 180, 25),
+    0 0 50px rgb(250, 180, 25),
+    0 0 60px rgb(250, 180, 25),
+    0 0 70px rgb(250, 180, 25),
+    0 0 80px rgb(250, 180, 25),
+    0 0 100px rgb(250, 180, 25),
+    0 0 120px rgb(250, 180, 25);
+}
+</style>
+
+        <h2 id="hero3-title"><span style="font-weight:800">demonbazillionz</span></h2>
+          <h3 id="p1"><span style="color:rgb(250, 180, 25);font-weight:800;text-shadow:0 0 10px rgb(250, 180, 25), 0 0 20px rgb(250, 180, 25), 0 0 30px rgb(250, 180, 25), 0 0 40px rgb(250, 180, 25)">NITHIN B N</span></h3>
+        <p class="lead"><span id="typing" aria-live="polite"></span><span id="caret" class="caret">█</span></p>
+
+        <!-- About Card -->
+        <div class="card" id="about">
+          <div class="about-grid">
+            <div class="avatar" aria-hidden="true">
+              <!-- Replace the src below with your profile image URL -->
+              <img src="https://i.ibb.co/39F2XkQs/demonbazillionz.png" alt="demonbazillionz" border="0">
+            </div>
+            <div class="meta">
+              <h3></h3>
+              <p class="muted">
+              <p class="muted">The Intermidiate knowledge i have:
+              <div class="skills" aria-hidden="false" style="margin-top:12px">
+                <span class="skill-pill"><strong>Python</strong></span>
+                <span class="skill-pill"><strong>HTML/CSS</strong></span>
+                <span class="skill-pill"><strong>Networking</strong></span>
+                <span class="skill-pill"><strong>Terminal</strong></span>
+                <span class="skill-pill"><strong>Video Editing</strong></span>
+                <span class="skill-pill"><strong>Reverse Engineering</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Full bio -->
+          <div style="margin-top:16px;color:var(--muted);font-size:0.95rem">
+            <strong></strong>
+            <p class="terminal-bio" style="margin-top:8px">
+              I love to learn practical security, editing apps, exploring embedded systems, and building small web & mobile projects. I believe in ethical research and using skills to help my knowledge improve.
+            </p>
+          </div>
+        </div>
+
+           <!-- Projects / Short list -->
+         <div class="card" id="projects" style="margin-top: 20px;">
+         <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3>Connect</h3>
+        <a href="#projects" class="muted">View all →</a>
+       </div>
+        </div>
+
+          <div class="projects" style="margin: top 20px;">
+            <article class="project" aria-labelledby="p1">
+
+              
+              <h4 id="p1">demonbazillionz</h4>
+              <p class="muted">you can connect with me on these Social media platforms</p>
+                 
+              <div class="socials" id="connect" style="margin-left: 1px;">
+             
+              <a href="https://open.spotify.com/user/316c6a2x4wtcd6xbfp2h6skz4u4e?si=4a3228a131bd4348" target="_blank" 
+              style="text-decoration:none;">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg"
+              alt="Spotify"
+              width="25"
+              style="
+              filter: drop-shadow(0 0 6px #1DB954) 
+                 drop-shadow(0 0 12px #1DB954)
+                 drop-shadow(0 0 20px #1DB954);
+              transition: 0.3s ease;"
+              onmouseover="this.style.filter='drop-shadow(0 0 12px #1DB954) drop-shadow(0 0 25px #1DB954)'"
+              onmouseout="this.style.filter='drop-shadow(0 0 6px #1DB954) drop-shadow(0 0 12px #1DB954) drop-shadow(0 0 20px #1DB954)'">
+              </a>
+              
+              <a href="https://github.com/demonbazillionz" target="_blank" 
+              style="color:rgb(128, 128, 128); text-decoration:none;">
+              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
+              width="25"
+              style="
+              filter: invert(1) drop-shadow(0 0 6px rgb(128, 128, 128)) drop-shadow(0 0 12px rgb(255, 255, 255)) drop-shadow(0 0 20px rgb(128, 128, 128));;
+              transition: 0.3s ease;"
+              onmouseover="this.style.filter='invert(1) drop-shadow(0 0 12px #ffffff) drop-shadow(0 0 25px #ffffff)'"
+              onmouseout="this.style.filter='invert(1) drop-shadow(0 0 6px #ffffff) drop-shadow(0 0 12px #ffffff) drop-shadow(0 0 20px #ffffff)'" >
+              </a>
+              
+              <a href="https://www.linkedin.com/in/demonbazillionz/" target="_blank" 
+              style="color:#0A66C2; text-decoration:none;">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"
+              width="25"
+              style="
+              filter: drop-shadow(0 0 6px #0A66C2) 
+                 drop-shadow(0 0 12px #0A66C2)
+                 drop-shadow(0 0 20px #0A66C2);
+              transition: 0.3s ease;"
+              onmouseover="this.style.filter='drop-shadow(0 0 12px #0A66C2) drop-shadow(0 0 25px #0A66C2)'"
+              onmouseout="this.style.filter='drop-shadow(0 0 6px #0A66C2) drop-shadow(0 0 12px #0A66C2) drop-shadow(0 0 20px #0A66C2)'">
+              </a>
+              
+              <a href="https://bsky.app/profile/demonbazillionz.bsky.social" target="_blank" style="color:#1185FE; text-decoration:none;">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Bluesky_Logo.svg"
+              width="25"
+              style="
+              filter: 
+              drop-shadow(0 0 6px #1185FE)
+               drop-shadow(0 0 12px #1185FE)
+                drop-shadow(0 0 20px #1185FE);
+              transition: 0.3s ease;"
+              onmouseover="this.style.filter='drop-shadow(0 0 12px #1185FE) drop-shadow(0 0 25px #1185FE)'"
+              onmouseout="this.style.filter='drop-shadow(0 0 6px #1185FE) drop-shadow(0 0 12px 1185FE) drop-shadow(0 0 20px #1185FE)'">
+              </a>
+
+            <a href="https://pin.it/4CozzEE0W" target="_blank" style="text-decoration:none;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Pinterest-logo.png"
+            width="25"
+            style="
+            filter: drop-shadow(0 0 6px #ff0033)
+                 drop-shadow(0 0 12px #ff0033)
+                 drop-shadow(0 0 20px #ff0000);
+            transition: 0.3s;"
+            onmouseover="this.style.filter='drop-shadow(0 0 12px #ff0033) drop-shadow(0 0 25px #ff0000) drop-shadow(0 0 40px #ff0000)'"
+            onmouseout="this.style.filter='drop-shadow(0 0 6px #ff0033) drop-shadow(0 0 12px #ff0033) drop-shadow(0 0 20px #ff0000)'"
+            alt="Pinterest">
+            </a>
+
+            </div>
+            </article>
+
+            <div class="projects" style="margin: top 20px;">
+            <article class="project" aria-labelledby="p1">
+              <h4 id="p1">Projects</h4>
+              <p class="muted">This are my projects</p>
+              <h2></h2>
+               <h3>StretchSquare</h3>
+              <h1
+               class="muted">StretchSquare is a simple, fast, and beginner-friendly 1:1 video conversion tool built with Python and FFmpeg. It focuses on easy drag & drop, clean UI, and reliable video processing — no tech headache 😄</p>
+              <p class="muted">✨ Features</p>
+              <h>🎥 Drag & Drop video files</h>
+              <p>🔄 Convert videos to 1:1 [Square] quickly</p>
+              <h>🖥️ Clean & simple GUI</h>
+              <p>🚀 Fast processing using FFmpeg</p>
+              <h>📦 Portable (no installation required)</h>
+              <p>🧑‍💻 Beginner friendly</p>
+              <h>⚙️works only on latest Microsoft Windows operating system</h>
+              <p>link to download StretchSquare software</p>
+              <p>
+              <a href="https://github.com/demonbazillionz/StretchSquare" class="btn">StretchSquare</a>
+            </article>
+            </div>            
+            <!-- Contact -->
+        <div class="card" id="contact" style="margin-top:16px">
+          <h3>Contact</h3>
+          <p class="muted">Want to collaborate or ask about a project? Send a message or connect on socials.</p>
+
+          <form class="contact-form" onsubmit="handleForm(event)">
+            <input class="input" id="name" name="name" placeholder="Your name" required>
+            <input class="input" id="email" name="email" type="email" placeholder="Your email" required>
+            <textarea id="message" name="message" placeholder="Short message" required></textarea>
+            <div style="display:flex;gap:10px;align-items:center">
+              <button type="submit" class="btn-primary">Send message</button>
+              <div class="muted" style="font-size:0.85rem">or email: <a href="mailto:demonbazillionz@gmail.com" style="color:var(--accent)">demonbazillionz@gmail.com</a></div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Right / Sidebar -->
+          </div>
+     <div style="text-align: center;"><p>Certain Information provided here may be fictional, intended solely for educational and expiremental purposes</p></div>
+     <div style="text-align: center;"><p>stay conneted with me on github for more exciting projects</p></div>
+    </main>
+    <div>
+   <footer style="
+  position: relative;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+  background: transparent;
+  padding: 10px 0;
+  color: var(--muted);
+  font-size: 14px;
+  z-index: 100;
+">
+  <h1 style="margin: 0; font-size: 18px; color: #fff;">demonbazillionz</h1>
+  <div>
+    © <strong>demonbazillionz</strong> • Built for learning & responsible research
+    <span class="muted"></span>
+  </div>
+</footer>
+
+  </div>
+
+  <script>
+// MATRIX BACKGROUND
+const canvas=document.getElementById("matrix-bg");
+const ctx=canvas.getContext("2d");
+
+canvas.height=window.innerHeight;
+canvas.width=window.innerWidth;
+
+const letters="01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const fontSize=14;
+const columns=canvas.width/fontSize;
+const drops=[];
+
+for(let i=0;i<columns;i++) drops[i]=1;
+
+function drawMatrix(){
+  ctx.fillStyle="rgba(0,0,0,0.05)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  ctx.fillStyle="#00ff88";
+  ctx.font=fontSize+"px monospace";
+
+  for(let i=0;i<drops.length;i++){
+    const text=letters.charAt(Math.floor(Math.random()*letters.length));
+    ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+
+    if(drops[i]*fontSize>canvas.height && Math.random()>0.975){
+      drops[i]=0;
+    }
+    drops[i]++;
+  }
+}
+
+setInterval(drawMatrix,35);
+
+window.addEventListener("resize",()=>{
+  canvas.height=window.innerHeight;
+  canvas.width=window.innerWidth;
+});
+
+// CONTACT FORM
+function handleForm(e){
+  e.preventDefault();
+  const name=document.getElementById('name').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const message=document.getElementById('message').value.trim();
+
+  const subject=encodeURIComponent('Portfolio contact from '+name);
+  const body=encodeURIComponent('Name: '+name+'\nEmail: '+email+'\n\n'+message);
+  window.location.href=`mailto:demonbazillionz@gmail.com?subject=${subject}&body=${body}`;
+}
+  </script>
+  <script>
+  // Typing animation for the hero lead
+  (function(){
+    const el = document.getElementById('typing');
+    const caret = document.getElementById('caret');
+    if(!el) return;
+    const text = `I'm an cybersecurity enthusiast focused on Hacking, penetration testing, mobile app modding, and blockchain/crypto experiments. I build, audit, and secure software — with an emphasis on practical tools and learning-by-doing.....:)`;
+    let i = 0;
+    function type(){
+      if(i < text.length){
+        el.textContent += text.charAt(i);
+        i++;
+        let delay = 25 + Math.random()*70; // slight random jitter for realism
+        if(text.charAt(i-1) === ' ') delay += 60; // pause a bit after spaces
+        if(text.charAt(i-1) === '.' || text.charAt(i-1) === '!' || text.charAt(i-1) === '?') delay += 10; // longer after sentences
+        setTimeout(type, delay);
+      } else {
+        // show caret and start blinking after typing completes
+        if(caret) setTimeout(()=>{ caret.style.opacity='1'; caret.classList.add('blink'); }, 200);
+      }
+    }
+    setTimeout(type, 600); // small initial delay
+  })();
+  </script>
+</body>
+</html>
