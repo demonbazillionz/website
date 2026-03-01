@@ -1311,25 +1311,29 @@
   <button class="ios-close" id="ios-close-btn">[ close ]</button>
 </div>
 
-<!-- ══════════════════════════════════════
+<!-- ══════════════════════════════════════════════
      ★ UNIVERSAL INSTALL MODAL ★
-     Detects browser automatically and shows
-     the exact right steps for that browser.
-     Works on Chrome Android, Brave, iOS Safari,
-     Samsung Internet, Firefox, Edge — everything.
-══════════════════════════════════════ -->
-<div id="install-modal" role="dialog" aria-modal="true" aria-label="Install demonbazillionz">
+     No auto popup — user taps FAB button to open
+     Installs as REAL APP in app drawer, not shortcut
+══════════════════════════════════════════════ -->
+<div id="install-modal" role="dialog" aria-modal="true" aria-label="Install demonbazillionz as app">
   <div class="modal-backdrop" id="modal-backdrop"></div>
   <div class="modal-box">
     <div class="modal-header">
-      <span><i class="fas fa-download" style="color:var(--c-red);margin-right:7px"></i>// install demonbazillionz</span>
+      <span><i class="fas fa-cube" style="color:var(--c-red);margin-right:7px"></i>// install as real app</span>
       <button class="modal-close" id="modal-close-btn">[ × close ]</button>
     </div>
     <div class="modal-body">
 
-      <!-- Browser selector tabs -->
+      <div style="font-size:10px;color:var(--c-muted);letter-spacing:1px;line-height:1.9;margin-bottom:14px;padding:10px;border:1px dashed rgba(57,255,133,0.12);background:rgba(57,255,133,0.02)">
+        <span style="color:var(--c-primary)">[ok]</span> installs in your <b style="color:var(--c-body)">app drawer</b> like a native app<br>
+        <span style="color:var(--c-primary)">[ok]</span> opens <b style="color:var(--c-body)">fullscreen</b> — zero browser UI<br>
+        <span style="color:var(--c-primary)">[ok]</span> works <b style="color:var(--c-body)">offline</b> after first install<br>
+        <span style="color:var(--c-primary)">[ok]</span> <b style="color:var(--c-body)">auto-updates</b> silently on next open
+      </div>
+
       <div class="browser-tabs">
-        <button class="btab" data-tab="chrome-android">Chrome Android</button>
+        <button class="btab" data-tab="chrome-android">Chrome</button>
         <button class="btab" data-tab="brave">Brave</button>
         <button class="btab" data-tab="ios">iOS Safari</button>
         <button class="btab" data-tab="samsung">Samsung</button>
@@ -1339,106 +1343,110 @@
 
       <!-- Chrome Android -->
       <div class="install-steps" id="steps-chrome-android">
-        <div class="step-title">// chrome android install</div>
+        <div class="step-title">// chrome android → real app install</div>
         <div class="step-row">
           <div class="step-num">1</div>
-          <div class="step-text">Tap the <b>⋮ three-dot menu</b> in the top-right corner of Chrome</div>
+          <div class="step-text">Tap the <b>⋮ three-dot menu</b> top-right in Chrome</div>
         </div>
         <div class="step-row">
           <div class="step-num">2</div>
-          <div class="step-text">Tap <em>Add to Home screen</em> from the menu</div>
+          <div class="step-text">Tap <em>Add to Home screen</em> — a dialog appears</div>
         </div>
         <div class="step-row">
           <div class="step-num">3</div>
-          <div class="step-text">Tap <em>Add</em> on the dialog that appears — done</div>
+          <div class="step-text">Tap <em>Install</em> on the dialog — this adds it to your <b>app drawer</b> as a real app</div>
         </div>
-        <button class="modal-instant" id="modal-instant-btn">⬇ tap to install instantly</button>
+        <div class="step-row">
+          <div class="step-num">4</div>
+          <div class="step-text">Open from app drawer — launches fullscreen, no browser bar ✓</div>
+        </div>
+        <button class="modal-instant" id="modal-instant-btn">⚡ one-tap install (if available)</button>
       </div>
 
       <!-- Brave -->
       <div class="install-steps" id="steps-brave">
-        <div class="step-title">// brave browser install</div>
+        <div class="step-title">// brave → real app install</div>
         <div class="step-row">
           <div class="step-num">1</div>
-          <div class="step-text">Tap the <b>⋮ menu</b> (top-right on Android) or <b>☰ menu</b> (bottom on iOS)</div>
+          <div class="step-text">Tap <b>⋮ menu</b> top-right (Android) or <b>☰</b> bottom-right (iOS)</div>
         </div>
         <div class="step-row">
           <div class="step-num">2</div>
-          <div class="step-text">Look for <em>Add to Home Screen</em> or <em>Install App</em> in the menu list</div>
+          <div class="step-text">Look for <em>Install App</em> or <em>Add to Home Screen</em> in the list</div>
         </div>
         <div class="step-row">
           <div class="step-num">3</div>
-          <div class="step-text">If not visible — tap <b>Share</b> icon then <em>Add to Home Screen</em></div>
+          <div class="step-text">Tap <em>Install</em> on the dialog — goes into your <b>app drawer</b></div>
         </div>
         <div class="step-row">
           <div class="step-num">4</div>
-          <div class="step-text">Confirm by tapping <em>Add</em> — icon appears on your homescreen</div>
+          <div class="step-text"><b>Note:</b> Brave blocks the auto prompt — menu install still works fine</div>
         </div>
       </div>
 
       <!-- iOS Safari -->
       <div class="install-steps" id="steps-ios">
-        <div class="step-title">// safari ios install</div>
+        <div class="step-title">// safari ios → app install</div>
         <div class="step-row">
           <div class="step-num">1</div>
-          <div class="step-text">Tap the <b>Share button</b> <em>↑</em> at the bottom of Safari (the box with arrow)</div>
+          <div class="step-text"><b>Must use Safari</b> — Chrome/Brave on iOS cannot install PWAs as real apps</div>
         </div>
         <div class="step-row">
           <div class="step-num">2</div>
-          <div class="step-text">Scroll down and tap <em>Add to Home Screen</em></div>
+          <div class="step-text">Tap the <b>Share ↑ button</b> at the bottom of Safari</div>
         </div>
         <div class="step-row">
           <div class="step-num">3</div>
-          <div class="step-text">Edit the name if you want — then tap <em>Add</em> in top-right corner</div>
+          <div class="step-text">Tap <em>Add to Home Screen</em> — on iOS this IS the real app install</div>
         </div>
         <div class="step-row">
           <div class="step-num">4</div>
-          <div class="step-text"><b>Note:</b> must use Safari — Chrome/Brave on iOS cannot install PWAs</div>
+          <div class="step-text">Tap <em>Add</em> — app appears in home screen AND app library, opens fullscreen ✓</div>
         </div>
       </div>
 
-      <!-- Samsung Internet -->
+      <!-- Samsung -->
       <div class="install-steps" id="steps-samsung">
-        <div class="step-title">// samsung internet install</div>
+        <div class="step-title">// samsung internet → real app install</div>
         <div class="step-row">
           <div class="step-num">1</div>
-          <div class="step-text">Tap the <b>☰ menu icon</b> at the bottom-right of Samsung Internet</div>
+          <div class="step-text">Tap <b>☰ menu</b> bottom-right in Samsung Internet</div>
         </div>
         <div class="step-row">
           <div class="step-num">2</div>
-          <div class="step-text">Tap <em>Add page to</em> then select <em>Home screen</em></div>
+          <div class="step-text">Tap <em>Add page to</em> → choose <em>Apps screen</em> (NOT Home screen — <b>Apps screen</b> = real app)</div>
         </div>
         <div class="step-row">
           <div class="step-num">3</div>
-          <div class="step-text">Tap <em>Add</em> to confirm — app icon will appear on homescreen</div>
+          <div class="step-text">Tap <em>Add</em> — find it in your app drawer, opens fullscreen ✓</div>
         </div>
-        <button class="modal-instant" id="modal-instant-btn-s">⬇ tap to install instantly</button>
+        <button class="modal-instant" id="modal-instant-btn-s">⚡ one-tap install (if available)</button>
       </div>
 
       <!-- Edge -->
       <div class="install-steps" id="steps-edge">
-        <div class="step-title">// microsoft edge install</div>
+        <div class="step-title">// edge → real app install</div>
         <div class="step-row">
           <div class="step-num">1</div>
-          <div class="step-text">Tap the <b>⋯ menu</b> at the bottom of Edge (mobile) or top-right (desktop)</div>
+          <div class="step-text">Tap <b>⋯ menu</b> (mobile: bottom bar / desktop: top-right)</div>
         </div>
         <div class="step-row">
           <div class="step-num">2</div>
-          <div class="step-text">Tap <em>Add to phone</em> or <em>Apps</em> → <em>Install this site as an app</em></div>
+          <div class="step-text">Tap <em>Apps</em> → <em>Install this site as an app</em></div>
         </div>
         <div class="step-row">
           <div class="step-num">3</div>
-          <div class="step-text">Tap <em>Install</em> to confirm — launches like a native app</div>
+          <div class="step-text">Tap <em>Install</em> — added to your apps list, opens in its own window ✓</div>
         </div>
-        <button class="modal-instant" id="modal-instant-btn-e">⬇ tap to install instantly</button>
+        <button class="modal-instant" id="modal-instant-btn-e">⚡ one-tap install (if available)</button>
       </div>
 
       <!-- Firefox -->
       <div class="install-steps" id="steps-firefox">
-        <div class="step-title">// firefox install</div>
+        <div class="step-title">// firefox → install</div>
         <div class="step-row">
           <div class="step-num">1</div>
-          <div class="step-text">Tap the <b>⋮ menu</b> (top-right on Android)</div>
+          <div class="step-text">Tap <b>⋮ menu</b> top-right on Android</div>
         </div>
         <div class="step-row">
           <div class="step-num">2</div>
@@ -1446,7 +1454,7 @@
         </div>
         <div class="step-row">
           <div class="step-num">3</div>
-          <div class="step-text"><b>Note:</b> Firefox has limited PWA support — Chrome or Edge recommended for best experience</div>
+          <div class="step-text"><b>Best experience:</b> use Chrome or Edge for full real-app install on Android</div>
         </div>
       </div>
 
@@ -1454,11 +1462,12 @@
   </div>
 </div>
 
-<!-- Floating install button — always visible, works on every browser -->
-<button id="install-fab" aria-label="Install app">
+<!-- ★ FLOATING INSTALL BUTTON — user taps this, zero auto-popups ★ -->
+<button id="install-fab" aria-label="Install as app">
   <span class="fab-dot"></span>
   ⬇ install app
 </button>
+
 
 <!-- PAGE -->
 <div id="page">
@@ -2019,12 +2028,9 @@ window.addEventListener('beforeinstallprompt', e => {
   deferredPrompt = e;
   console.log('[DBZ-PWA] beforeinstallprompt captured');
 
-  // Also show the old banner for quick install on supported browsers
-  if (!isInstalled) {
-    setTimeout(() => {
-      banner.classList.add('visible');
-    }, 4000);
-  }
+  // Banner NO longer auto-shows — user taps the install button themselves
+  // Just log that prompt is ready
+  logActivity('t-ok', 'pwa install ready — tap install button');
 });
 
 // Old banner buttons
