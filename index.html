@@ -890,6 +890,199 @@
     }
 
     /* ══════════════════════════════════════════
+       ★ MANUAL INSTALL MODAL ★
+       Works on every browser — no beforeinstallprompt needed
+    ══════════════════════════════════════════ */
+    #install-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 999995;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 20px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+    #install-modal.open {
+      pointer-events: all;
+      opacity: 1;
+    }
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+    }
+    .modal-box {
+      position: relative;
+      z-index: 2;
+      width: min(480px, calc(100vw - 24px));
+      background: rgba(3, 8, 4, 0.99);
+      border: 1px solid rgba(57,255,133,0.3);
+      box-shadow: 0 -4px 60px rgba(0,0,0,0.8), 0 0 40px rgba(57,255,133,0.05);
+      transform: translateY(40px);
+      transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    #install-modal.open .modal-box { transform: translateY(0); }
+    .modal-header {
+      background: linear-gradient(90deg, rgba(139,0,0,0.12), rgba(57,255,133,0.03), transparent);
+      border-bottom: 1px solid var(--c-border);
+      padding: 11px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 9.5px;
+      color: var(--c-muted);
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+    }
+    .modal-close {
+      background: transparent;
+      border: 1px solid rgba(255,34,68,0.2);
+      color: var(--c-red);
+      font-family: var(--f-mono);
+      font-size: 10px;
+      padding: 3px 9px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: background 0.2s;
+    }
+    .modal-close:hover { background: rgba(255,34,68,0.08); }
+    .modal-body { padding: 18px 20px 22px; }
+    .browser-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .btab {
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      padding: 5px 12px;
+      border: 1px solid var(--c-border);
+      background: transparent;
+      color: var(--c-muted);
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .btab.active {
+      border-color: rgba(57,255,133,0.4);
+      color: var(--c-primary);
+      background: rgba(57,255,133,0.05);
+    }
+    .btab:hover:not(.active) { border-color: rgba(57,255,133,0.2); color: var(--c-body); }
+    .install-steps { display: none; }
+    .install-steps.active { display: block; }
+    .step-title {
+      font-family: var(--f-display);
+      font-size: 0.65rem;
+      color: var(--c-primary);
+      letter-spacing: 2px;
+      margin-bottom: 14px;
+      text-shadow: 0 0 8px rgba(57,255,133,0.2);
+    }
+    .step-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px dashed rgba(57,255,133,0.07);
+    }
+    .step-row:last-of-type { border-bottom: none; }
+    .step-num {
+      flex-shrink: 0;
+      width: 22px; height: 22px;
+      border: 1px solid rgba(255,34,68,0.4);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--c-red);
+      font-family: var(--f-vt);
+      font-size: 1.1rem;
+    }
+    .step-text {
+      font-size: 11.5px;
+      color: var(--c-body);
+      letter-spacing: 1px;
+      line-height: 1.65;
+      flex: 1;
+    }
+    .step-text b { color: var(--c-primary); font-weight: normal; }
+    .step-text em {
+      color: var(--c-amber);
+      font-style: normal;
+      border: 1px solid rgba(255,187,51,0.25);
+      padding: 1px 5px;
+      font-size: 10px;
+      letter-spacing: 1px;
+    }
+    .modal-instant {
+      display: none;
+      width: 100%;
+      font-family: var(--f-mono);
+      font-size: 11px;
+      color: #000;
+      background: var(--c-primary);
+      border: none;
+      padding: 11px;
+      cursor: pointer;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-top: 14px;
+      transition: filter 0.15s;
+      box-shadow: 0 0 20px rgba(57,255,133,0.15);
+    }
+    .modal-instant.show { display: block; }
+    .modal-instant:hover { filter: brightness(1.1); }
+
+    /* Floating Action Button — always visible, never fails */
+    #install-fab {
+      position: fixed;
+      bottom: 24px;
+      right: 20px;
+      z-index: 99990;
+      background: rgba(3,8,4,0.97);
+      border: 1px solid rgba(57,255,133,0.4);
+      color: var(--c-primary);
+      font-family: var(--f-mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      padding: 10px 16px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 0 20px rgba(57,255,133,0.08), 0 4px 20px rgba(0,0,0,0.5);
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+      animation: fab-breathe 3s ease-in-out infinite;
+    }
+    #install-fab.show { display: flex; }
+    #install-fab:hover {
+      border-color: rgba(57,255,133,0.7);
+      box-shadow: 0 0 30px rgba(57,255,133,0.15), 0 4px 20px rgba(0,0,0,0.5);
+      transform: translateY(-2px);
+    }
+    @keyframes fab-breathe {
+      0%,100% { box-shadow: 0 0 20px rgba(57,255,133,0.08), 0 4px 20px rgba(0,0,0,0.5); }
+      50%      { box-shadow: 0 0 28px rgba(57,255,133,0.18), 0 4px 20px rgba(0,0,0,0.5); }
+    }
+    .fab-dot {
+      width: 6px; height: 6px;
+      background: var(--c-primary);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--c-primary);
+      animation: bdot 1.4s step-start infinite;
+    }
+    @media (pointer: coarse) {
+      #install-fab { cursor: pointer; }
+      .modal-close, .btab, .modal-instant { cursor: pointer; }
+    }
+
+    /* ══════════════════════════════════════════
        ★ AUTO-UPDATE TOAST ★
        Slides in from top when a new SW activates
     ══════════════════════════════════════════ */
@@ -1117,6 +1310,155 @@
   </div>
   <button class="ios-close" id="ios-close-btn">[ close ]</button>
 </div>
+
+<!-- ══════════════════════════════════════
+     ★ UNIVERSAL INSTALL MODAL ★
+     Detects browser automatically and shows
+     the exact right steps for that browser.
+     Works on Chrome Android, Brave, iOS Safari,
+     Samsung Internet, Firefox, Edge — everything.
+══════════════════════════════════════ -->
+<div id="install-modal" role="dialog" aria-modal="true" aria-label="Install demonbazillionz">
+  <div class="modal-backdrop" id="modal-backdrop"></div>
+  <div class="modal-box">
+    <div class="modal-header">
+      <span><i class="fas fa-download" style="color:var(--c-red);margin-right:7px"></i>// install demonbazillionz</span>
+      <button class="modal-close" id="modal-close-btn">[ × close ]</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Browser selector tabs -->
+      <div class="browser-tabs">
+        <button class="btab" data-tab="chrome-android">Chrome Android</button>
+        <button class="btab" data-tab="brave">Brave</button>
+        <button class="btab" data-tab="ios">iOS Safari</button>
+        <button class="btab" data-tab="samsung">Samsung</button>
+        <button class="btab" data-tab="edge">Edge</button>
+        <button class="btab" data-tab="firefox">Firefox</button>
+      </div>
+
+      <!-- Chrome Android -->
+      <div class="install-steps" id="steps-chrome-android">
+        <div class="step-title">// chrome android install</div>
+        <div class="step-row">
+          <div class="step-num">1</div>
+          <div class="step-text">Tap the <b>⋮ three-dot menu</b> in the top-right corner of Chrome</div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">2</div>
+          <div class="step-text">Tap <em>Add to Home screen</em> from the menu</div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">3</div>
+          <div class="step-text">Tap <em>Add</em> on the dialog that appears — done</div>
+        </div>
+        <button class="modal-instant" id="modal-instant-btn">⬇ tap to install instantly</button>
+      </div>
+
+      <!-- Brave -->
+      <div class="install-steps" id="steps-brave">
+        <div class="step-title">// brave browser install</div>
+        <div class="step-row">
+          <div class="step-num">1</div>
+          <div class="step-text">Tap the <b>⋮ menu</b> (top-right on Android) or <b>☰ menu</b> (bottom on iOS)</div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">2</div>
+          <div class="step-text">Look for <em>Add to Home Screen</em> or <em>Install App</em> in the menu list</div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">3</div>
+          <div class="step-text">If not visible — tap <b>Share</b> icon then <em>Add to Home Screen</em></div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">4</div>
+          <div class="step-text">Confirm by tapping <em>Add</em> — icon appears on your homescreen</div>
+        </div>
+      </div>
+
+      <!-- iOS Safari -->
+      <div class="install-steps" id="steps-ios">
+        <div class="step-title">// safari ios install</div>
+        <div class="step-row">
+          <div class="step-num">1</div>
+          <div class="step-text">Tap the <b>Share button</b> <em>↑</em> at the bottom of Safari (the box with arrow)</div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">2</div>
+          <div class="step-text">Scroll down and tap <em>Add to Home Screen</em></div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">3</div>
+          <div class="step-text">Edit the name if you want — then tap <em>Add</em> in top-right corner</div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">4</div>
+          <div class="step-text"><b>Note:</b> must use Safari — Chrome/Brave on iOS cannot install PWAs</div>
+        </div>
+      </div>
+
+      <!-- Samsung Internet -->
+      <div class="install-steps" id="steps-samsung">
+        <div class="step-title">// samsung internet install</div>
+        <div class="step-row">
+          <div class="step-num">1</div>
+          <div class="step-text">Tap the <b>☰ menu icon</b> at the bottom-right of Samsung Internet</div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">2</div>
+          <div class="step-text">Tap <em>Add page to</em> then select <em>Home screen</em></div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">3</div>
+          <div class="step-text">Tap <em>Add</em> to confirm — app icon will appear on homescreen</div>
+        </div>
+        <button class="modal-instant" id="modal-instant-btn-s">⬇ tap to install instantly</button>
+      </div>
+
+      <!-- Edge -->
+      <div class="install-steps" id="steps-edge">
+        <div class="step-title">// microsoft edge install</div>
+        <div class="step-row">
+          <div class="step-num">1</div>
+          <div class="step-text">Tap the <b>⋯ menu</b> at the bottom of Edge (mobile) or top-right (desktop)</div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">2</div>
+          <div class="step-text">Tap <em>Add to phone</em> or <em>Apps</em> → <em>Install this site as an app</em></div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">3</div>
+          <div class="step-text">Tap <em>Install</em> to confirm — launches like a native app</div>
+        </div>
+        <button class="modal-instant" id="modal-instant-btn-e">⬇ tap to install instantly</button>
+      </div>
+
+      <!-- Firefox -->
+      <div class="install-steps" id="steps-firefox">
+        <div class="step-title">// firefox install</div>
+        <div class="step-row">
+          <div class="step-num">1</div>
+          <div class="step-text">Tap the <b>⋮ menu</b> (top-right on Android)</div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">2</div>
+          <div class="step-text">Tap <em>Install</em> or <em>Add to Home Screen</em></div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">3</div>
+          <div class="step-text"><b>Note:</b> Firefox has limited PWA support — Chrome or Edge recommended for best experience</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Floating install button — always visible, works on every browser -->
+<button id="install-fab" aria-label="Install app">
+  <span class="fab-dot"></span>
+  ⬇ install app
+</button>
 
 <!-- PAGE -->
 <div id="page">
@@ -1538,49 +1880,156 @@ document.addEventListener('click', e => {
 });
 
 /* ══════════════════════════════════════════
-   ★ PWA INSTALL LOGIC ★
-   Handles: Chrome/Edge/Android (beforeinstallprompt)
-            iOS Safari (manual guide)
-            Already installed detection
+   ★ UNIVERSAL PWA INSTALL SYSTEM ★
+   Strategy:
+   1. Always show FAB button (works on ALL browsers)
+   2. Auto-detect browser → pre-select correct tab
+   3. If beforeinstallprompt fires → show 1-tap button
+   4. Old banner still works for Chrome/Edge desktop
+   5. iOS Safari → show manual steps automatically
 ══════════════════════════════════════════ */
-let deferredPrompt = null;
-const banner      = document.getElementById('pwa-banner');
-const iosPr       = document.getElementById('ios-prompt');
-const installBtn  = document.getElementById('pwa-install-btn');
-const dismissBtn  = document.getElementById('pwa-dismiss-btn');
-const iosClose    = document.getElementById('ios-close-btn');
-const pwaTrigger  = document.getElementById('pwa-trigger');
-const pwaStatus   = document.getElementById('pwa-status');
 
-// Detect if already installed (standalone mode)
+// ── Core state ──
+let deferredPrompt = null;
+const pwaStatus  = document.getElementById('pwa-status');
+const pwaTrigger = document.getElementById('pwa-trigger');
+const banner     = document.getElementById('pwa-banner');
+const iosPr      = document.getElementById('ios-prompt');
+const installBtn = document.getElementById('pwa-install-btn');
+const dismissBtn = document.getElementById('pwa-dismiss-btn');
+const iosClose   = document.getElementById('ios-close-btn');
+
+// ── Install Modal elements ──
+const installModal   = document.getElementById('install-modal');
+const modalBackdrop  = document.getElementById('modal-backdrop');
+const modalCloseBtn  = document.getElementById('modal-close-btn');
+const installFab     = document.getElementById('install-fab');
+const instantBtns    = document.querySelectorAll('[id^="modal-instant-btn"]');
+const btabs          = document.querySelectorAll('.btab');
+
+// ── Detect environment ──
 const isInstalled = window.matchMedia('(display-mode: standalone)').matches
                   || window.navigator.standalone === true;
+const ua = navigator.userAgent.toLowerCase();
+const isIOS        = /iphone|ipad|ipod/.test(ua);
+// On iOS, Chrome/Brave/Firefox all use WebKit — only native Safari can install PWA
+const isSafariOnly = isIOS && !(/crios|fxios|opios|mercury|gsa/.test(ua));
+const isEdge       = /edg\//.test(ua);
+const isSamsung    = /samsungbrowser/.test(ua);
+const isFirefox    = /firefox|fxios/.test(ua) && !/seamonkey/.test(ua);
+// Brave: check navigator.userAgentData brands (most reliable)
+let isBrave = false;
+if (navigator.userAgentData?.brands) {
+  isBrave = navigator.userAgentData.brands.some(b => b.brand === 'Brave');
+}
+// Async fallback for navigator.brave API
+if (!isBrave && navigator.brave) {
+  navigator.brave.isBrave().then(b => { isBrave = b; }).catch(() => {});
+}
+const isChrome  = /chrome/.test(ua) && !isEdge && !isSamsung;
+const isMobile  = /android|iphone|ipad|ipod|mobile/.test(ua);
 
+// ── Update status panel ──
 if (isInstalled) {
   pwaStatus.textContent = 'installed';
   pwaStatus.style.color = 'var(--c-primary)';
 }
 
-// Detect iOS
-const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+// ── Detect which browser tab to auto-select ──
+function getDefaultTab() {
+  if (isIOS && isSafariOnly) return 'ios';
+  if (isIOS) return 'ios'; // All iOS browsers: must use Safari anyway
+  if (isBrave)   return 'brave';
+  if (isEdge)    return 'edge';
+  if (isSamsung) return 'samsung';
+  if (isFirefox) return 'firefox';
+  return 'chrome-android'; // default for Chrome Android + everything else
+}
 
-// --- Chrome / Edge / Android flow ---
+// ── Switch browser tab ──
+function switchTab(tabId) {
+  btabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tabId));
+  document.querySelectorAll('.install-steps').forEach(s => {
+    s.classList.toggle('active', s.id === 'steps-' + tabId);
+  });
+}
+
+btabs.forEach(tab => {
+  tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+});
+
+// ── Open modal ──
+function openInstallModal() {
+  switchTab(getDefaultTab());
+  // Show instant button if we have deferred prompt
+  document.querySelectorAll('.modal-instant').forEach(b => {
+    b.classList.toggle('show', !!deferredPrompt);
+  });
+  installModal.classList.add('open');
+  logActivity('t-warn', 'install guide opened — follow steps');
+}
+
+// ── Close modal ──
+function closeInstallModal() {
+  installModal.classList.remove('open');
+}
+
+modalCloseBtn?.addEventListener('click', closeInstallModal);
+modalBackdrop?.addEventListener('click', closeInstallModal);
+
+// ── Instant install buttons inside modal ──
+instantBtns.forEach(btn => {
+  btn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    closeInstallModal();
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      pwaStatus.textContent = 'installed';
+      pwaStatus.style.color = 'var(--c-primary)';
+      installFab.classList.remove('show');
+      pwaTrigger.classList.remove('show');
+      logActivity('t-ok', 'pwa installed — offline ready');
+    }
+    deferredPrompt = null;
+  });
+});
+
+// ── FAB button ──
+// Show on ALL devices if not already installed (no waiting for beforeinstallprompt)
+if (!isInstalled) {
+  setTimeout(() => {
+    installFab.classList.add('show');
+    pwaTrigger.classList.add('show');
+
+    // On mobile: auto-open the modal once on first visit so user knows they can install
+    // Use sessionStorage so it only shows once per session, not every page load
+    if (isMobile && !sessionStorage.getItem('dbz-install-shown')) {
+      sessionStorage.setItem('dbz-install-shown', '1');
+      setTimeout(() => openInstallModal(), 500); // small delay after FAB appears
+    }
+  }, 4000); // wait for boot screen to finish
+}
+installFab?.addEventListener('click', openInstallModal);
+pwaTrigger?.addEventListener('click', openInstallModal);
+
+// ── beforeinstallprompt (Chrome/Edge/Android) ──
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
+  console.log('[DBZ-PWA] beforeinstallprompt captured');
 
-  // Show banner after boot screen clears
-  setTimeout(() => {
-    if (!isInstalled) {
+  // Also show the old banner for quick install on supported browsers
+  if (!isInstalled) {
+    setTimeout(() => {
       banner.classList.add('visible');
-      pwaTrigger.classList.add('show');
-    }
-  }, 4000);
+    }, 4000);
+  }
 });
 
-installBtn.addEventListener('click', async () => {
-  if (!deferredPrompt) return;
+// Old banner buttons
+installBtn?.addEventListener('click', async () => {
+  if (!deferredPrompt) { openInstallModal(); return; }
   banner.classList.remove('visible');
   banner.classList.add('dismissed');
   deferredPrompt.prompt();
@@ -1588,56 +2037,31 @@ installBtn.addEventListener('click', async () => {
   if (outcome === 'accepted') {
     pwaStatus.textContent = 'installed';
     pwaStatus.style.color = 'var(--c-primary)';
-    pwaTrigger.classList.remove('show');
-    logActivity('t-ok', 'pwa installed — working offline');
-  } else {
-    pwaTrigger.classList.add('show');
+    installFab.classList.remove('show');
+    logActivity('t-ok', 'pwa installed — offline ready');
   }
   deferredPrompt = null;
 });
 
-dismissBtn.addEventListener('click', () => {
+dismissBtn?.addEventListener('click', () => {
   banner.classList.remove('visible');
   banner.classList.add('dismissed');
-  pwaTrigger.classList.add('show');
 });
 
-// Footer trigger re-shows the banner / prompt
-pwaTrigger.addEventListener('click', () => {
-  if (isIOS && isSafari && !isInstalled) {
-    iosPr.classList.add('visible');
-  } else if (deferredPrompt) {
-    banner.classList.remove('dismissed');
-    banner.classList.add('visible');
-  }
-});
-
-// --- iOS Safari flow ---
-if (isIOS && isSafari && !isInstalled) {
-  setTimeout(() => {
-    iosPr.classList.add('visible');
-    pwaTrigger.classList.add('show');
-  }, 5000);
-}
-
-iosClose.addEventListener('click', () => {
-  iosPr.classList.remove('visible');
-  iosPr.classList.add('dismissed');
-});
-
-// Detect after install
+// ── appinstalled event ──
 window.addEventListener('appinstalled', () => {
   pwaStatus.textContent = 'installed';
   pwaStatus.style.color = 'var(--c-primary)';
+  installFab.classList.remove('show');
   banner.classList.remove('visible');
   banner.classList.add('dismissed');
-  pwaTrigger.classList.remove('show');
-  logActivity('t-ok', 'pwa daemon summoned — offline ready');
+  closeInstallModal();
+  logActivity('t-ok', 'pwa daemon installed — works offline');
 });
 
-// SW update notification
-navigator.serviceWorker?.addEventListener('controllerchange', () => {
-  if (window._swUpdated) logActivity('t-warn', 'daemon updated — refresh to apply');
+// ── Keyboard close modal ──
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeInstallModal();
 });
 
 /* ══════════════════════════════════════════
