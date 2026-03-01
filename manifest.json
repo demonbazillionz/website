@@ -5,20 +5,27 @@
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui", "browser"],
   "orientation": "portrait-primary",
   "background_color": "#000000",
   "theme_color": "#000000",
-  "categories": ["productivity"],
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["productivity", "education", "security"],
   "screenshots": [
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
-      "form_factor": "narrow"
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "demonbazillionz mobile"
     },
     {
       "src": "icons/icon-512.png",
       "sizes": "512x512",
-      "form_factor": "wide"
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "demonbazillionz desktop"
     }
   ],
   "icons": [
@@ -33,6 +40,28 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Projects",
+      "short_name": "Projects",
+      "description": "View demonbazillionz projects",
+      "url": "./index.html#projects",
+      "icons": [{"src": "icons/icon-192.png", "sizes": "192x192"}]
+    }
+  ],
+  "prefer_related_applications": false
 }

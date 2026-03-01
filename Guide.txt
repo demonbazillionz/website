@@ -1,0 +1,16 @@
+copy these URL and paste on search engines, just to verify weather all are working correct 
+
+Manifest file
+https://demonbazillionz.github.io/demonbazillionz/manifest.json
+
+Icon 192×192
+https://demonbazillionz.github.io/demonbazillionz/icons/icon-192.png
+
+Icon 512×512
+https://demonbazillionz.github.io/demonbazillionz/icons/icon-512.png
+
+Service Worker
+https://demonbazillionz.github.io/demonbazillionz/service-worker.js
+
+load correctly
+https://demonbazillionz.github.io/demonbazillionz/
