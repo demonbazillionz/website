@@ -1,64 +1,115 @@
-/* ═══════════════════════════════════════════
-   demonbazillionz — Service Worker v6
-   Bump CACHE_VERSION on every deploy to push
-   updates to all installed users automatically
-═══════════════════════════════════════════ */
-const CACHE_VERSION = "v6";
-const CACHE_NAME    = "dbz-" + CACHE_VERSION;
-const OFFLINE_URL   = "./offline.html";
+const CACHE_NAME = "dbz-pwa-cache-v4";
 
-const PRECACHE = [
-  "./index.html",
-  "./manifest.json",
-  "./matrix.js",
-  "./offline.html",
-  "./icons/icon-192.png",
-  "./icons/icon-512.png"
+const urlsToCache = [
+  './index.html',
+  './manifest.json',
+  './hacker-bg.css',
+  './matrix.js',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
 ];
 
-self.addEventListener("install", e => {
-  e.waitUntil(
+// Security headers injected on every cached response
+const SECURITY_HEADERS = {
+  'X-Frame-Options': 'DENY',
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'no-referrer',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  'Cross-Origin-Opener-Policy': 'same-origin',
+  'Cross-Origin-Resource-Policy': 'same-origin',
+};
+
+function addSecurityHeaders(response) {
+  const headers = new Headers(response.headers);
+  for (const [k, v] of Object.entries(SECURITY_HEADERS)) {
+    headers.set(k, v);
+  }
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
+}
+
+// Install event - cache essential files
+self.addEventListener("install", event => {
+  console.log('Service Worker installing...');
+  event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(c => c.addAll(PRECACHE).catch(() => {}))
-      .then(() => self.skipWaiting())
+      .then(cache => {
+        console.log('Caching essential files');
+        return cache.addAll(urlsToCache).catch(err => {
+          console.warn('Cache.addAll error:', err);
+        });
+      })
   );
+  self.skipWaiting();
 });
 
-self.addEventListener("activate", e => {
-  e.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
-      .then(() => self.clients.claim())
-      .then(() => self.clients.matchAll({ type: "window" }))
-      .then(clients => clients.forEach(c => c.postMessage({ type: "SW_UPDATED", version: CACHE_VERSION })))
+// Activate event - clean up old caches
+self.addEventListener("activate", event => {
+  console.log('Service Worker activating...');
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
   );
+  self.clients.claim();
 });
 
-self.addEventListener("fetch", e => {
-  const url = new URL(e.request.url);
-  if (!["http:","https:"].includes(url.protocol)) return;
-  if (url.origin !== location.origin) return;
-  if (e.request.method !== "GET") return;
+// Fetch event - network first, fallback to cache, always inject security headers
+self.addEventListener('fetch', event => {
+  const { request } = event;
+  const url = new URL(request.url);
 
-  if (e.request.mode === "navigate") {
-    e.respondWith(fetch(e.request).then(r => {
-      if (r.ok) caches.open(CACHE_NAME).then(c => c.put(e.request, r.clone()));
-      return r;
-    }).catch(() => caches.match(OFFLINE_URL)));
+  // Block any non-HTTPS requests (except localhost for dev)
+  if (url.protocol === 'http:' && url.hostname !== 'localhost') {
+    const httpsUrl = request.url.replace('http:', 'https:');
+    event.respondWith(Response.redirect(httpsUrl, 301));
     return;
   }
 
-  e.respondWith(
-    caches.match(e.request).then(cached => {
-      const net = fetch(e.request).then(r => {
-        if (r && r.ok) caches.open(CACHE_NAME).then(c => c.put(e.request, r.clone()));
-        return r;
-      }).catch(() => cached);
-      return cached || net;
-    })
-  );
-});
+  // Skip cross-origin requests entirely
+  if (url.origin !== location.origin) {
+    return;
+  }
 
-self.addEventListener("message", e => {
-  if (e.data?.type === "SKIP_WAITING") self.skipWaiting();
+  // Handle navigation requests
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          if (!response || response.status !== 200 || response.type === 'error') {
+            return caches.match('./index.html');
+          }
+          return addSecurityHeaders(response);
+        })
+        .catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+
+  // For other requests: network first, fallback to cache
+  event.respondWith(
+    fetch(request)
+      .then(response => {
+        if (!response || response.status !== 200) {
+          return caches.match(request);
+        }
+        const secureResponse = addSecurityHeaders(response.clone());
+        // Cache the secured response
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(request, response.clone());
+        });
+        return secureResponse;
+      })
+      .catch(() => caches.match(request))
+  );
 });

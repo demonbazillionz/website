@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Don't expose internal config files to crawlers
+Disallow: /manifest.json
+Disallow: /service-worker.js
+Disallow: /.well-known/
+
+Sitemap: https://demonbazillionz.github.io/demonbazillionz/sitemap.xml

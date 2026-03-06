@@ -1,0 +1,15 @@
+# Security Policy — demonbazillionz
+# Place this file at: /.well-known/security.txt
+# Standard: https://securitytxt.org/
+
+Contact: mailto:demonbazillionz@gmail.com
+Preferred-Languages: en
+Scope: https://demonbazillionz.github.io/demonbazillionz/
+
+# This is a static educational/portfolio site.
+# No server-side code, no database, no user accounts.
+# Responsible disclosure is appreciated.
+
+Policy: All research must be ethical and non-destructive.
+        Do not test on live visitors. Do not store or publish any data.
+        Report findings privately before any public disclosure.

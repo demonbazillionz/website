@@ -5,492 +5,332 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>demonbazillionz</title>
 
-  <!-- PWA -->
+  <!-- ═══════════════════════════════════════════
+       SECURITY HEADERS (meta fallbacks)
+       Primary headers should be set server-side.
+       These are client-side fallbacks for GitHub Pages.
+  ═══════════════════════════════════════════ -->
+
+  <!-- Content Security Policy: restrict what can load and from where -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
+    font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+    img-src 'self' data: https://i.ibb.co https://cdn.jsdelivr.net https://upload.wikimedia.org;
+    connect-src 'none';
+    frame-src 'none';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'none';
+  ">
+
+  <!-- Block your page from being embedded in iframes (clickjacking) -->
+  <meta http-equiv="X-Frame-Options" content="DENY">
+
+  <!-- Stop browsers from sniffing MIME types -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+
+  <!-- No referrer sent to external sites when clicking links -->
+  <meta name="referrer" content="no-referrer">
+
+  <!-- Disable browser features you don't use -->
+  <meta http-equiv="Permissions-Policy" content="
+    camera=(),
+    microphone=(),
+    geolocation=(),
+    payment=(),
+    usb=(),
+    interest-cohort=()
+  ">
+
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
-  <meta name="description" content="demonbazillionz — Reverse engineering and Cybersecurity by NITHIN B N">
+  <meta name="description" content="demonbazillionz - Reverse engineering and Cybersecurity">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="DBZ">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="icon" href="icons/icon-192.png">
 
-  <!-- OG -->
-  <meta property="og:title" content="demonbazillionz">
-  <meta property="og:description" content="Reverse engineering and Cybersecurity by NITHIN B N">
-  <meta property="og:image" content="https://i.ibb.co/39F2XkQs/demonbazillionz.png">
-  <meta property="og:type" content="website">
-
-  <!-- ══════════════════════════════════
-       SERVICE WORKER REGISTRATION
-       Registers SW, listens for update
-       message, triggers toast on update
-  ══════════════════════════════════ -->
   <script>
-  (function () {
-    if (!('serviceWorker' in navigator)) return;
-
-    window.addEventListener('load', function () {
-      navigator.serviceWorker.register('./service-worker.js')
-        .then(function (reg) {
-          // Check for updates every 60 seconds
-          setInterval(function () { reg.update(); }, 60000);
-        })
-        .catch(function (e) { console.warn('[SW]', e); });
-
-      // Listen for SW_UPDATED broadcast from service worker
-      navigator.serviceWorker.addEventListener('message', function (e) {
-        if (e.data && e.data.type === 'SW_UPDATED') {
-          showUpdateToast(e.data.version);
-        }
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(r => console.log('SW:', r.scope))
+          .catch(e => console.warn('SW fail:', e));
       });
-
-      // When SW controller changes → page has new version → reload
-      var refreshing = false;
-      navigator.serviceWorker.addEventListener('controllerchange', function () {
-        if (!refreshing) { refreshing = true; window.location.reload(); }
-      });
-    });
-  })();
+    }
   </script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <!-- Google Fonts with crossorigin to prevent referrer leakage -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <!-- Font Awesome with Subresource Integrity — tamper-proof CDN asset -->
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"/>
 
   <style>
+    /* ═══════════════════════════════════════════
+       COLOUR SYSTEM  —  bright & readable
+       ─────────────────────────────────────────
+       --c-primary   : main green (headings, labels)
+       --c-body      : body copy (light, easy to read)
+       --c-muted     : secondary info (still visible)
+       --c-faint     : meta / decorative text
+       --c-red       : accent / warning / demon
+       --c-amber     : moderate warning
+       --c-violet    : soul counter / special
+    ═══════════════════════════════════════════ */
     :root {
-      --green   : #39ff85;
-      --green2  : #c8ffd4;
-      --green3  : #7de89a;
-      --green4  : #3d8f56;
-      --border  : #1a3d26;
-      --red     : #ff2244;
-      --blood   : #8b0000;
-      --amber   : #ffbb33;
-      --violet  : #bb55ff;
-      --cyan    : #33ddff;
-      --surface : rgba(4,10,6,0.94);
-      --header  : rgba(8,0,2,0.98);
-      --mono    : 'Share Tech Mono','Courier New',monospace;
-      --display : 'Orbitron',monospace;
-      --vt      : 'VT323',monospace;
+      /* Greens */
+      --c-primary : #39ff85;   /* bright neon green  — titles, icons        */
+      --c-body    : #c8ffd4;   /* near-white green   — all body copy         */
+      --c-muted   : #7de89a;   /* medium green       — secondary labels      */
+      --c-faint   : #3d8f56;   /* dimmer green       — decorative / meta     */
+      --c-border  : #1a3d26;   /* panel borders                              */
+
+      /* Reds */
+      --c-red     : #ff2244;   /* bright crimson     — demon accent          */
+      --c-blood   : #8b0000;
+      --c-amber   : #ffbb33;
+      --c-violet  : #bb55ff;
+      --c-cyan    : #33ddff;
+
+      /* Surfaces */
+      --c-bg      : #000000;
+      --c-surface : rgba(4, 10, 6, 0.94);
+      --c-header  : rgba(8, 0, 2, 0.98);
+
+      /* Fonts */
+      --f-mono    : 'Share Tech Mono', 'Courier New', monospace;
+      --f-display : 'Orbitron', monospace;
+      --f-vt      : 'VT323', monospace;
     }
 
-    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 
-    html,body {
+    html, body {
       width:100%; min-height:100vh;
-      background:#000; color:var(--green2);
-      font-family:var(--mono); font-size:13.5px;
-      line-height:1.6; overflow-x:hidden;
-      -webkit-font-smoothing:antialiased;
+      background: var(--c-bg);
+      color: var(--c-body);
+      font-family: var(--f-mono);
+      font-size: 13.5px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      cursor: none;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Scanlines */
+    /* ── SCANLINES (static — no animation cost) ── */
     body::before {
-      content:''; position:fixed; inset:0; pointer-events:none; z-index:9999;
-      background:repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(0,0,0,.08) 3px,rgba(0,0,0,.08) 4px);
+      content:''; position:fixed; inset:0;
+      background: repeating-linear-gradient(0deg,
+        transparent 0px, transparent 3px,
+        rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px
+      );
+      pointer-events:none; z-index:9999;
     }
-    /* Vignette */
+
+    /* ── VIGNETTE ── */
     body::after {
-      content:''; position:fixed; inset:0; pointer-events:none; z-index:9998;
-      background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.75) 100%);
+      content:''; position:fixed; inset:0;
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.75) 100%);
+      pointer-events:none; z-index:9998;
     }
 
-    /* Touch devices use native cursor */
-    @media (pointer:fine) { html,body { cursor:none; } }
-
-    /* ── Custom cursor ── */
+    /* ── CURSOR ── */
     #cursor {
       position:fixed; pointer-events:none; z-index:99999;
-      font-size:15px; color:var(--red);
-      text-shadow:0 0 8px var(--red);
-      will-change:transform; display:none;
+      font-size:15px; line-height:1;
+      color: var(--c-red);
+      text-shadow: 0 0 8px var(--c-red);
+      will-change: transform;
     }
-    @media (pointer:fine) { #cursor { display:block; } }
+    .cursor-trail {
+      position:fixed; pointer-events:none; z-index:99998;
+      border-radius:50%; width:4px; height:4px;
+      background: var(--c-red);
+      will-change: transform, opacity;
+    }
 
-    /* ── Matrix ── */
+    /* ── MATRIX CANVAS ── */
     #matrix-canvas {
       position:fixed; inset:0; width:100%; height:100%;
-      z-index:1; opacity:.13; pointer-events:none;
+      z-index:1; opacity:0.13; will-change:transform;
     }
 
-    /* ── Sigil ── */
+    /* ── SIGIL BG ── */
     #sigil-bg {
       position:fixed; top:50%; left:50%;
       width:min(540px,85vw); height:min(540px,85vw);
-      z-index:2; opacity:.04; pointer-events:none;
-      transform:translate(-50%,-50%);
-      animation:sigil-rot 65s linear infinite;
+      z-index:2; opacity:0.04; pointer-events:none;
+      animation: sigil-rot 65s linear infinite;
+      will-change:transform;
     }
     @keyframes sigil-rot { to { transform:translate(-50%,-50%) rotate(360deg); } }
+    #sigil-bg { transform:translate(-50%,-50%) rotate(0deg); }
 
-    /* ── Blood canvas ── */
+    /* ── BLOOD CANVAS ── */
     #blood-canvas {
-      position:fixed; inset:0; z-index:3; pointer-events:none;
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      z-index:3; pointer-events:none; will-change:transform;
     }
 
-    /* ── Noise ── */
+    /* ── NOISE (static texture) ── */
     #noise {
-      position:fixed; inset:0; z-index:4; pointer-events:none; opacity:.025;
-      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      position:fixed; inset:0; z-index:4;
+      pointer-events:none; opacity:0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size:200px;
     }
 
-    /* ── Lightning ── */
+    /* ── LIGHTNING ── */
     #lightning { position:fixed; inset:0; z-index:5; pointer-events:none; opacity:0; }
 
-    /* ── Ghost particles ── */
-    .ghost {
+    /* ── GHOST PARTICLES ── */
+    .ghost-particle {
       position:fixed; pointer-events:none; z-index:6;
-      font-size:12px; font-family:var(--mono);
-      animation:ghost-fly 2s ease-out forwards;
+      font-size:12px; font-family:var(--f-mono);
+      animation: ghost-fly 2s ease-out forwards;
     }
     @keyframes ghost-fly {
-      0%  { opacity:1; transform:translateY(0) scale(1); }
-      100%{ opacity:0; transform:translateY(-80px) scale(.4); }
+      0%  { opacity:1;   transform:translateY(0) scale(1); }
+      100%{ opacity:0;   transform:translateY(-80px) scale(0.4); }
     }
 
-    /* ════════════════════════════════════════
+    /* ══════════════════════════════════════════
        BOOT SCREEN
-    ════════════════════════════════════════ */
-    #boot {
+    ══════════════════════════════════════════ */
+    #boot-screen {
       position:fixed; inset:0; background:#000;
       z-index:99997;
       display:flex; flex-direction:column;
       align-items:center; justify-content:center; gap:12px;
-      transition:opacity .7s ease;
+      transition: opacity 0.7s ease;
     }
-    #boot.out { opacity:0; pointer-events:none; }
+    #boot-screen.fade-out { opacity:0; pointer-events:none; }
 
     #boot-logo {
       width:100px; height:100px; border-radius:12px;
-      border:1px solid rgba(250,180,25,.45); overflow:hidden;
-      animation:logo-beat 1.1s ease-in-out infinite alternate;
+      border:1px solid rgba(250,180,25,0.45);
+      overflow:hidden;
+      animation: logo-beat 1.1s ease-in-out infinite alternate;
     }
-    #boot-logo img { width:100%; height:100%; object-fit:cover; display:block;
-      filter:sepia(1) hue-rotate(320deg) saturate(1.8) brightness(.75); }
+    #boot-logo img {
+      width:100%; height:100%; object-fit:cover; display:block;
+      filter: sepia(1) hue-rotate(320deg) saturate(1.8) brightness(0.75);
+    }
     @keyframes logo-beat {
-      from { box-shadow:0 0 18px rgba(250,180,25,.3); transform:scale(1); }
-      to   { box-shadow:0 0 44px rgba(250,180,25,.6); transform:scale(1.04); }
+      from { box-shadow:0 0 18px rgba(250,180,25,0.3);  transform:scale(1); }
+      to   { box-shadow:0 0 44px rgba(250,180,25,0.6);  transform:scale(1.04); }
     }
 
     .boot-line {
-      font-size:11px; letter-spacing:2px; opacity:0;
-      animation:bshow .05s forwards;
+      font-family:var(--f-mono); font-size:11px;
+      letter-spacing:2px; opacity:0;
+      animation:bshow 0.05s forwards;
     }
     @keyframes bshow { to { opacity:1; } }
 
-    #boot-bar-wrap {
-      width:220px; height:2px;
-      background:rgba(57,255,133,.08); overflow:hidden; margin-top:6px;
-    }
-    #boot-bar {
-      height:100%; width:0%;
-      background:linear-gradient(90deg,var(--blood),var(--red));
-      box-shadow:0 0 8px rgba(255,34,68,.5);
-      transition:width .1s ease;
-    }
-
-    /* ════════════════════════════════════════
-       ★ UPDATE TOAST ★
-       Only shows when SW pushes an update.
-       Auto-reloads in 3s. User can dismiss.
-    ════════════════════════════════════════ */
-    #update-toast {
-      position:fixed; top:-110px; left:50%;
-      transform:translateX(-50%);
-      z-index:999999;
-      width:min(440px,calc(100vw - 20px));
-      background:rgba(2,8,3,.99);
-      border:1px solid rgba(57,255,133,.5);
-      box-shadow:0 8px 40px rgba(0,0,0,.7);
-      padding:13px 16px;
-      display:flex; align-items:center; gap:12px;
-      transition:top .6s cubic-bezier(.34,1.56,.64,1);
-    }
-    #update-toast.show { top:14px; }
-    #update-toast.hide { top:-110px; transition:top .35s ease-in; }
-
-    .toast-ico {
-      flex-shrink:0; width:34px; height:34px;
-      border:1px solid rgba(57,255,133,.3);
-      display:flex; align-items:center; justify-content:center;
-      font-size:15px;
-      animation:ico-pulse 1.5s ease-in-out infinite;
-    }
-    @keyframes ico-pulse {
-      0%,100%{ box-shadow:0 0 0 0 rgba(57,255,133,.4); }
-      50%    { box-shadow:0 0 0 7px rgba(57,255,133,0); }
-    }
-    .toast-body { flex:1; min-width:0; }
-    .toast-title {
-      font-family:var(--display); font-size:.6rem;
-      color:var(--green); letter-spacing:2px; margin-bottom:2px;
-    }
-    .toast-sub { font-size:9.5px; color:var(--green3); letter-spacing:1px; }
-    .toast-bar-wrap { height:2px; background:rgba(57,255,133,.08); margin-top:6px; overflow:hidden; }
-    .toast-bar-fill {
-      height:100%; width:100%;
-      background:linear-gradient(90deg,var(--green4),var(--green));
-    }
-    .toast-bar-fill.drain { animation:drain 3s linear forwards; }
-    @keyframes drain { to { width:0%; } }
-    .toast-btns { display:flex; flex-direction:column; gap:4px; flex-shrink:0; }
-    .toast-now {
-      font-family:var(--mono); font-size:9px; color:#000;
-      background:var(--green); border:none; padding:6px 11px;
-      cursor:pointer; letter-spacing:1.5px; font-weight:700;
-    }
-    .toast-later {
-      font-family:var(--mono); font-size:8.5px; color:var(--green4);
-      background:transparent; border:1px solid rgba(57,255,133,.1);
-      padding:4px 8px; cursor:pointer; letter-spacing:1px; text-align:center;
-    }
-    @media (pointer:coarse) { .toast-now,.toast-later { cursor:pointer; } }
-
-    /* ════════════════════════════════════════
-       ★ INSTALL MODAL ★
-       Hidden by default.
-       Only opens when user clicks install button.
-       Zero auto-popups ever.
-    ════════════════════════════════════════ */
-    #install-modal {
-      position:fixed; inset:0; z-index:99996;
-      display:flex; align-items:flex-end; justify-content:center;
-      padding:0 12px 20px;
-      opacity:0; pointer-events:none;
-      transition:opacity .3s ease;
-    }
-    #install-modal.open { opacity:1; pointer-events:all; }
-
-    .im-backdrop {
-      position:absolute; inset:0;
-      background:rgba(0,0,0,.8);
-      backdrop-filter:blur(4px);
-      -webkit-backdrop-filter:blur(4px);
-    }
-
-    .im-box {
-      position:relative; z-index:1;
-      width:min(500px,100%);
-      background:rgba(3,8,4,.99);
-      border:1px solid rgba(57,255,133,.28);
-      box-shadow:0 -4px 60px rgba(0,0,0,.9), 0 0 30px rgba(57,255,133,.04);
-      transform:translateY(30px);
-      transition:transform .45s cubic-bezier(.34,1.56,.64,1);
-    }
-    #install-modal.open .im-box { transform:translateY(0); }
-
-    .im-head {
-      background:linear-gradient(90deg,rgba(139,0,0,.1),rgba(57,255,133,.02),transparent);
-      border-bottom:1px solid var(--border);
-      padding:10px 16px;
-      display:flex; align-items:center; justify-content:space-between;
-    }
-    .im-head-title {
-      font-family:var(--display); font-size:.6rem;
-      color:var(--green); letter-spacing:2px;
-    }
-    .im-close {
-      background:transparent;
-      border:1px solid rgba(255,34,68,.2);
-      color:var(--red); font-family:var(--mono);
-      font-size:10px; padding:3px 9px;
-      cursor:pointer; letter-spacing:1px;
-    }
-    @media (pointer:coarse) { .im-close { cursor:pointer; } }
-
-    .im-body { padding:16px 18px 20px; }
-
-    /* Info strip */
-    .im-info {
-      font-size:10px; color:var(--green3);
-      letter-spacing:1px; line-height:1.9;
-      padding:9px 12px; margin-bottom:14px;
-      border:1px dashed rgba(57,255,133,.1);
-      background:rgba(57,255,133,.015);
-    }
-    .im-info b { color:var(--green2); font-weight:normal; }
-
-    /* One-tap button — shown only if beforeinstallprompt captured */
-    #im-onetap {
-      display:none; width:100%;
-      font-family:var(--mono); font-size:11px; color:#000;
-      background:var(--green); border:none;
-      padding:12px; cursor:pointer;
-      letter-spacing:2px; font-weight:700;
-      margin-bottom:14px;
-      box-shadow:0 0 20px rgba(57,255,133,.2);
-      transition:filter .15s;
-    }
-    #im-onetap.show { display:block; }
-    #im-onetap:hover { filter:brightness(1.1); }
-    @media (pointer:coarse) { #im-onetap { cursor:pointer; } }
-
-    /* Browser tabs */
-    .im-tabs {
-      display:flex; gap:5px; flex-wrap:wrap; margin-bottom:14px;
-    }
-    .im-tab {
-      font-family:var(--mono); font-size:9px; letter-spacing:1.5px;
-      padding:5px 11px; border:1px solid var(--border);
-      background:transparent; color:var(--green4);
-      cursor:pointer; text-transform:uppercase;
-      transition:all .2s;
-    }
-    .im-tab.on {
-      border-color:rgba(57,255,133,.45);
-      color:var(--green); background:rgba(57,255,133,.04);
-    }
-    @media (pointer:coarse) { .im-tab { cursor:pointer; } }
-
-    /* Steps panel */
-    .im-steps { display:none; }
-    .im-steps.on { display:block; }
-
-    .step {
-      display:flex; align-items:flex-start; gap:11px;
-      padding:9px 0;
-      border-bottom:1px dashed rgba(57,255,133,.06);
-    }
-    .step:last-child { border-bottom:none; }
-    .step-n {
-      flex-shrink:0; width:22px; height:22px;
-      border:1px solid rgba(255,34,68,.35);
-      display:flex; align-items:center; justify-content:center;
-      color:var(--red); font-family:var(--vt); font-size:1.1rem;
-    }
-    .step-t {
-      font-size:11.5px; color:var(--green2);
-      letter-spacing:.8px; line-height:1.65; flex:1;
-    }
-    .step-t b  { color:var(--green); font-weight:normal; }
-    .step-t em {
-      font-style:normal; color:var(--amber);
-      border:1px solid rgba(255,187,51,.2);
-      padding:1px 5px; font-size:10px;
-    }
-    .step-t .note {
-      display:block; margin-top:4px;
-      font-size:10px; color:var(--green4);
-    }
-
-    /* ════════════════════════════════════════
-       ★ INSTALL FAB ★
-       Bottom-right floating button.
-       Always visible (not installed).
-       User taps it → opens install modal.
-       ZERO auto-popups.
-    ════════════════════════════════════════ */
-    #install-fab {
-      position:fixed; bottom:22px; right:18px;
-      z-index:99990;
-      display:none; align-items:center; gap:8px;
-      background:rgba(3,8,4,.97);
-      border:1px solid rgba(57,255,133,.4);
-      color:var(--green);
-      font-family:var(--mono); font-size:10px; letter-spacing:1.5px;
-      padding:10px 16px;
-      cursor:pointer;
-      box-shadow:0 0 18px rgba(57,255,133,.07), 0 4px 18px rgba(0,0,0,.5);
-      transition:border-color .2s, transform .2s, box-shadow .2s;
-      animation:fab-pulse 3s ease-in-out infinite;
-    }
-    #install-fab.show { display:flex; }
-    #install-fab:hover {
-      border-color:rgba(57,255,133,.7);
-      transform:translateY(-2px);
-      box-shadow:0 0 28px rgba(57,255,133,.15), 0 6px 20px rgba(0,0,0,.5);
-    }
-    @keyframes fab-pulse {
-      0%,100%{ box-shadow:0 0 18px rgba(57,255,133,.07), 0 4px 18px rgba(0,0,0,.5); }
-      50%    { box-shadow:0 0 26px rgba(57,255,133,.16), 0 4px 18px rgba(0,0,0,.5); }
-    }
-    .fab-dot {
-      width:6px; height:6px; border-radius:50%;
-      background:var(--green); box-shadow:0 0 6px var(--green);
-      animation:blink 1.4s step-start infinite;
-    }
-    @keyframes blink { 50%{opacity:0;} }
-    @media (pointer:coarse) { #install-fab { cursor:pointer; } }
-
-    /* ════════════════════════════════════════
-       PAGE LAYOUT
-    ════════════════════════════════════════ */
+    /* ══════════════════════════════════════════
+       PAGE WRAPPER
+    ══════════════════════════════════════════ */
     #page {
       position:relative; z-index:10;
       max-width:1080px; margin:0 auto;
-      padding:20px 20px 80px;
+      padding:20px 20px 60px;
     }
 
-    /* Access bar */
+    /* ══════════════════════════════════════════
+       ACCESS BAR
+    ══════════════════════════════════════════ */
     #access-bar {
-      border:1px solid rgba(220,20,60,.2); border-bottom:none;
-      background:linear-gradient(90deg,#0c0000,#050200,#000602);
+      border:1px solid rgba(220,20,60,0.2); border-bottom:none;
+      background: linear-gradient(90deg, #0c0000, #050200, #000602);
       padding:5px 16px;
       display:flex; justify-content:space-between; align-items:center;
-      font-size:10px; color:var(--green4); letter-spacing:1.5px; text-transform:uppercase;
+      font-size:10px; color:var(--c-faint);
+      letter-spacing:1.5px; text-transform:uppercase;
     }
     .blink-dot {
       display:inline-block; width:6px; height:6px;
-      background:var(--red); border-radius:50%;
-      box-shadow:0 0 6px var(--red);
-      animation:blink 1.4s step-start infinite; margin-right:6px;
+      background:var(--c-red); border-radius:50%;
+      box-shadow:0 0 6px var(--c-red);
+      animation:bdot 1.4s step-start infinite; margin-right:6px;
     }
-    .s-ok   { color:var(--green); }
-    .s-warn { color:var(--amber); }
-    .s-err  { color:var(--red); }
-    .s-evil { color:var(--violet); }
+    @keyframes bdot { 50%{opacity:0} }
+    .s-ok   { color: var(--c-primary); }
+    .s-warn { color: var(--c-amber); }
+    .s-evil { color: var(--c-red); }
 
-    /* Terminal frame */
-    #terminal {
-      border:1px solid rgba(220,20,60,.18);
-      background:var(--surface);
-      box-shadow:0 0 50px rgba(139,0,0,.07), inset 0 0 60px rgba(0,0,0,.5);
-      animation:frame-breathe 14s ease-in-out infinite;
+    /* ══════════════════════════════════════════
+       TERMINAL FRAME
+    ══════════════════════════════════════════ */
+    #terminal-frame {
+      border:1px solid rgba(220,20,60,0.18);
+      background: var(--c-surface);
+      box-shadow: 0 0 50px rgba(139,0,0,0.07), inset 0 0 60px rgba(0,0,0,0.5);
+      animation: frame-breathe 14s ease-in-out infinite;
     }
     @keyframes frame-breathe {
-      0%,100%{ box-shadow:0 0 50px rgba(139,0,0,.07), inset 0 0 60px rgba(0,0,0,.5); }
-      50%    { box-shadow:0 0 90px rgba(139,0,0,.14), inset 0 0 60px rgba(0,0,0,.5); }
+      0%,100%{ box-shadow:0 0 50px rgba(139,0,0,0.07), inset 0 0 60px rgba(0,0,0,0.5); }
+      50%    { box-shadow:0 0 90px rgba(139,0,0,0.14), inset 0 0 60px rgba(0,0,0,0.5); }
     }
 
-    #t-bar {
-      background:var(--header); border-bottom:1px solid rgba(220,20,60,.14);
-      padding:7px 14px; display:flex; align-items:center; gap:7px;
-      font-size:10px; color:var(--green3); letter-spacing:1.5px;
+    #terminal-titlebar {
+      background: var(--c-header);
+      border-bottom:1px solid rgba(220,20,60,0.14);
+      padding:7px 14px;
+      display:flex; align-items:center; gap:7px;
+      font-size:10px; color:var(--c-muted); letter-spacing:1.5px;
     }
-    .wb { width:10px; height:10px; border-radius:50%; }
-    .wb-r{ background:#ff3b30; box-shadow:0 0 5px #ff3b30; }
-    .wb-y{ background:#ffcc00; box-shadow:0 0 4px #ffcc00; }
-    .wb-g{ background:#28a745; box-shadow:0 0 4px #28a745; }
+    .win-btn { width:10px; height:10px; border-radius:50%; }
+    .wb-close{ background:#ff3b30; box-shadow:0 0 5px #ff3b30; }
+    .wb-min  { background:#ffcc00; box-shadow:0 0 4px #ffcc00; }
+    .wb-max  { background:#28a745; box-shadow:0 0 4px #28a745; }
 
-    #t-body { padding:26px 28px 32px; }
+    #terminal-body { padding:26px 28px 32px; }
 
-    /* Title */
+    /* ══════════════════════════════════════════
+       MAIN TITLE
+    ══════════════════════════════════════════ */
     #title-wrap { text-align:center; margin-bottom:20px; }
+
     #site-title {
-      font-family:var(--display); font-size:clamp(1.6rem,4.2vw,3rem);
-      font-weight:900; color:var(--green); text-transform:lowercase;
-      letter-spacing:5px; position:relative; display:inline-block;
-      text-shadow:0 0 16px rgba(57,255,133,.4), 0 0 40px rgba(57,255,133,.15);
-      animation:title-flicker 10s ease-in-out infinite;
+      font-family: var(--f-display);
+      font-size: clamp(1.6rem, 4.2vw, 3rem);
+      font-weight: 900;
+      color: var(--c-primary);
+      text-transform: lowercase;
+      letter-spacing: 5px;
+      position: relative;
+      display: inline-block;
+      text-shadow: 0 0 16px rgba(57,255,133,0.4), 0 0 40px rgba(57,255,133,0.15);
+      animation: title-flicker 10s ease-in-out infinite;
     }
     @keyframes title-flicker {
-      0%,16%,18%,20%,90%,100%{ color:var(--green); text-shadow:0 0 16px rgba(57,255,133,.4); }
-      17%{ color:var(--red);    text-shadow:0 0 14px rgba(255,34,68,.6); }
-      91%{ color:var(--violet); text-shadow:0 0 14px rgba(187,85,255,.5); }
+      0%,16%,18%,20%,90%,100%{
+        color:var(--c-primary);
+        text-shadow:0 0 16px rgba(57,255,133,0.4), 0 0 40px rgba(57,255,133,0.15);
+      }
+      17%{ color:var(--c-red); text-shadow:0 0 14px rgba(255,34,68,0.6); }
+      91%{ color:var(--c-violet); text-shadow:0 0 14px rgba(187,85,255,0.5); }
     }
+    /* Subtle glitch layers */
     #site-title::before {
       content:attr(data-text); position:absolute; left:0; top:0;
-      color:var(--red); opacity:.55; animation:glitch-r 4.5s infinite;
+      color:var(--c-red); opacity:0.55;
+      animation:glitch-r 4.5s infinite;
     }
     #site-title::after {
       content:attr(data-text); position:absolute; left:0; top:0;
-      color:var(--cyan); opacity:.4; animation:glitch-c 4.5s infinite .8s;
+      color:var(--c-cyan); opacity:0.4;
+      animation:glitch-c 4.5s infinite 0.8s;
     }
     @keyframes glitch-r {
       0%,90%,100%{ transform:translate(0); clip-path:polygon(0 0,100% 0,100% 0,0 0); }
@@ -504,283 +344,408 @@
     }
     #site-title.inv { filter:invert(1) hue-rotate(180deg); }
 
-    .demon-sub {
-      font-family:var(--vt); font-size:clamp(1rem,2.4vw,1.35rem);
-      color:var(--red); letter-spacing:3px; margin-top:5px; opacity:.85;
+    .demon-subtitle {
+      font-family: var(--f-vt);
+      font-size: clamp(1rem, 2.4vw, 1.35rem);
+      color: var(--c-red);
+      letter-spacing: 3px;
+      margin-top: 5px;
+      opacity: 0.85;
     }
 
+    /* Pentagram */
     #penta-wrap { margin:10px auto 0; width:44px; height:44px; position:relative; }
-    #penta-svg  { width:100%; height:100%; animation:pspin 24s linear infinite;
-      filter:drop-shadow(0 0 5px var(--red)); }
-    #penta-inner{ position:absolute; top:0; left:0; width:100%; height:100%;
-      animation:pspin 12s linear infinite reverse; opacity:.35; }
+    #penta-svg  {
+      width:100%; height:100%;
+      animation:pspin 24s linear infinite; will-change:transform;
+      filter:drop-shadow(0 0 5px var(--c-red));
+    }
+    #penta-inner {
+      position:absolute; top:0; left:0; width:100%; height:100%;
+      animation:pspin 12s linear infinite reverse; opacity:0.35; will-change:transform;
+    }
     @keyframes pspin { to { transform:rotate(360deg); } }
 
-    /* Warning banner */
-    #warn-banner {
-      border:1px solid rgba(255,34,68,.22); background:rgba(10,0,3,.97);
+    /* ══════════════════════════════════════════
+       WARNING BANNER
+    ══════════════════════════════════════════ */
+    #warning-banner {
+      border:1px solid rgba(255,34,68,0.22);
+      background:rgba(10,0,3,0.97);
       padding:8px 16px; margin:18px 0 0;
-      font-size:10.5px; color:rgba(255,100,120,.9); letter-spacing:1.5px;
+      font-size:10.5px; color: rgba(255,100,120,0.9);
+      letter-spacing:1.5px;
       display:flex; gap:10px; align-items:center;
       animation:warn-breathe 3.5s ease-in-out infinite;
     }
     @keyframes warn-breathe {
-      0%,100%{ border-color:rgba(255,34,68,.22); }
-      50%    { border-color:rgba(255,34,68,.45); }
+      0%,100%{ border-color:rgba(255,34,68,0.22); }
+      50%    { border-color:rgba(255,34,68,0.45); }
     }
+    .warn-icon { color:var(--c-red); animation:bdot 1s step-start infinite; }
 
-    /* Typing prompt */
+    /* ══════════════════════════════════════════
+       TYPING PROMPT
+    ══════════════════════════════════════════ */
     .prompt-line {
-      margin-top:20px; font-size:.84rem; color:var(--green2);
+      margin-top:20px; font-size:0.84rem; color: var(--c-body);
       display:flex; gap:8px; flex-wrap:wrap; align-items:flex-start;
     }
-    .ps1 { color:var(--red); white-space:nowrap; flex-shrink:0; font-weight:bold; }
-    .ps1 span { color:var(--green); }
-    #typing-out { flex:1; color:var(--green2); word-break:break-word; }
+    .ps1 { color:var(--c-red); white-space:nowrap; flex-shrink:0; font-weight:bold; }
+    .ps1 span { color:var(--c-primary); }
+    #typing-output { flex:1; color:var(--c-body); word-break:break-word; }
     #caret {
       display:inline-block; width:8px; height:1em;
-      background:var(--red); vertical-align:text-bottom; margin-left:2px;
-      animation:blink 1s step-start infinite;
+      background:var(--c-red); vertical-align:text-bottom; margin-left:2px;
+      animation:blink-c 1s step-start infinite;
     }
+    @keyframes blink-c { 50%{opacity:0} }
 
-    /* Hexdump */
-    .hexdump {
-      font-size:8px; color:rgba(57,255,133,.07);
-      letter-spacing:1.5px; line-height:2; font-family:var(--mono);
-      user-select:none; overflow:hidden; max-height:46px;
-    }
-
-    /* Log ticker */
-    #ticker {
-      border:1px solid rgba(220,20,60,.15); border-top:none;
-      background:rgba(4,0,1,.98); padding:6px 14px;
-      font-size:9.5px; color:var(--green3); letter-spacing:1.5px;
+    /* ══════════════════════════════════════════
+       LOG TICKER
+    ══════════════════════════════════════════ */
+    #log-ticker {
+      border:1px solid rgba(220,20,60,0.15); border-top:none;
+      background:rgba(4,0,1,0.98);
+      padding:6px 14px; font-size:9.5px;
+      color: var(--c-muted); letter-spacing:1.5px;
       overflow:hidden; white-space:nowrap; margin-bottom:14px;
     }
-    .tick-inner { display:inline-block; animation:scroll 38s linear infinite; }
-    @keyframes scroll { 0%{transform:translateX(100vw)} 100%{transform:translateX(-100%)} }
+    .ticker-inner {
+      display:inline-block;
+      animation:ticker 38s linear infinite;
+      will-change:transform;
+    }
+    @keyframes ticker { 0%{transform:translateX(100vw)} 100%{transform:translateX(-100%)} }
+    .t-ok   { color: var(--c-primary); }
+    .t-warn { color: var(--c-amber); }
+    .t-err  { color: var(--c-red); }
+    .t-evil { color: var(--c-violet); }
 
-    /* Soul counter */
-    #soul-bar {
-      border:1px solid rgba(187,85,255,.2); background:rgba(6,0,12,.97);
+    /* ══════════════════════════════════════════
+       SOUL COUNTER
+    ══════════════════════════════════════════ */
+    #soul-counter {
+      border:1px solid rgba(187,85,255,0.2);
+      background:rgba(6,0,12,0.97);
       padding:8px 16px; margin-bottom:16px;
       display:flex; justify-content:space-between; align-items:center;
-      font-size:10.5px; letter-spacing:1.5px; color:var(--green3);
+      font-size:10.5px; letter-spacing:1.5px; color: var(--c-muted);
     }
-    #soul-val {
-      font-family:var(--vt); font-size:1.3rem; color:var(--violet);
-      letter-spacing:3px; text-shadow:0 0 10px rgba(187,85,255,.6);
+    #soul-count-val {
+      font-family:var(--f-vt); font-size:1.3rem;
+      color:var(--c-violet); letter-spacing:3px;
+      text-shadow:0 0 10px rgba(187,85,255,0.6);
     }
+    .soul-skull { color:var(--c-violet); animation:bdot 1.9s step-start infinite; }
 
-    /* Hex divider */
-    .divider {
+    /* ══════════════════════════════════════════
+       DIVIDERS
+    ══════════════════════════════════════════ */
+    .hex-divider {
       margin:18px 0; display:flex; align-items:center; gap:10px;
-      font-size:9px; color:var(--green4); letter-spacing:3px;
+      font-size:9px; color: var(--c-faint); letter-spacing:3px;
     }
-    .divider::before,.divider::after {
+    .hex-divider::before,.hex-divider::after {
       content:''; flex:1; height:1px;
-      background:linear-gradient(90deg,transparent,var(--border),transparent);
+      background:linear-gradient(90deg,transparent,var(--c-border),transparent);
     }
 
-    /* Grid */
-    .grid { display:grid; grid-template-columns:1fr 285px; gap:16px; }
-    @media(max-width:820px){ .grid{grid-template-columns:1fr} }
+    /* ══════════════════════════════════════════
+       GRID
+    ══════════════════════════════════════════ */
+    .main-grid { display:grid; grid-template-columns:1fr 285px; gap:16px; }
+    @media(max-width:820px){ .main-grid{grid-template-columns:1fr} }
 
-    /* Panel */
+    /* ══════════════════════════════════════════
+       PANELS
+    ══════════════════════════════════════════ */
     .panel {
-      background:rgba(3,8,4,.92);
-      border:1px solid var(--border);
+      background: rgba(3,8,4,0.92);
+      border:1px solid var(--c-border);
       position:relative; overflow:hidden;
-      transition:border-color .3s, box-shadow .3s;
+      transition:border-color 0.3s, box-shadow 0.3s;
     }
     .panel:hover {
-      border-color:rgba(220,20,60,.25);
-      box-shadow:0 0 20px rgba(139,0,0,.08);
+      border-color:rgba(220,20,60,0.25);
+      box-shadow:0 0 20px rgba(139,0,0,0.08);
     }
+    /* Corner brackets */
     .panel::after {
       content:''; position:absolute; top:0; right:0;
       width:13px; height:13px;
-      border-top:1px solid var(--red);
-      border-right:1px solid var(--red);
-      pointer-events:none; opacity:.35;
+      border-top:1px solid var(--c-red);
+      border-right:1px solid var(--c-red);
+      pointer-events:none; opacity:0.35;
     }
     .corner-bl {
       position:absolute; bottom:0; left:0;
       width:13px; height:13px;
-      border-bottom:1px solid var(--green);
-      border-left:1px solid var(--green);
-      pointer-events:none; z-index:2; opacity:.35;
+      border-bottom:1px solid var(--c-primary);
+      border-left:1px solid var(--c-primary);
+      pointer-events:none; z-index:2; opacity:0.35;
     }
-    .p-head {
-      background:linear-gradient(90deg,rgba(139,0,0,.08),rgba(57,255,133,.02),transparent);
-      border-bottom:1px solid var(--border);
-      padding:9px 16px; display:flex; align-items:center; gap:8px;
-      font-size:9.5px; color:var(--green3);
+
+    .panel-header {
+      background:linear-gradient(90deg,rgba(139,0,0,0.08),rgba(57,255,133,0.02),transparent);
+      border-bottom:1px solid var(--c-border);
+      padding:9px 16px;
+      display:flex; align-items:center; gap:8px;
+      font-size:9.5px; color: var(--c-muted);
       letter-spacing:2.5px; text-transform:uppercase;
       position:relative; z-index:2;
     }
-    .p-icon { color:var(--red); font-size:11px; }
-    .p-tag  { margin-left:auto; color:var(--green4); font-size:8.5px; }
-    .p-body { padding:16px; position:relative; z-index:2; }
+    .ph-icon { color:var(--c-red); font-size:11px; }
+    .ph-tag  { margin-left:auto; color:var(--c-faint); font-size:8.5px; }
 
-    /* Agent */
-    .about-row { display:flex; gap:16px; align-items:flex-start; margin-bottom:14px; }
-    .avatar {
+    .panel-body { padding:16px; position:relative; z-index:2; }
+
+    /* ══════════════════════════════════════════
+       AGENT / ABOUT
+    ══════════════════════════════════════════ */
+    .about-grid { display:flex; gap:16px; align-items:flex-start; margin-bottom:14px; }
+
+    .avatar-frame {
       flex-shrink:0; width:80px; height:80px;
-      border:1px solid rgba(220,20,60,.4);
-      overflow:hidden; position:relative;
-      animation:av-haunt 9s ease-in-out infinite;
+      border:1px solid rgba(220,20,60,0.4);
+      position:relative; overflow:hidden;
+      animation: av-haunt 9s ease-in-out infinite;
     }
     @keyframes av-haunt {
-      0%,100%{ box-shadow:0 0 12px rgba(139,0,0,.2); }
-      50%    { box-shadow:0 0 26px rgba(220,20,60,.38); }
+      0%,100%{ box-shadow:0 0 12px rgba(139,0,0,0.2); }
+      50%    { box-shadow:0 0 26px rgba(220,20,60,0.38); }
     }
-    .avatar img {
+    .avatar-frame img {
       width:100%; height:100%; object-fit:cover; display:block;
-      filter:saturate(.15) sepia(1) hue-rotate(320deg) brightness(.7) contrast(1.2);
-      animation:av-glitch 14s ease-in-out infinite;
+      filter: saturate(0.15) sepia(1) hue-rotate(320deg) brightness(0.7) contrast(1.2);
+      animation: av-glitch 14s ease-in-out infinite;
     }
     @keyframes av-glitch {
-      0%,93%,100%{ filter:saturate(.15) sepia(1) hue-rotate(320deg) brightness(.7) contrast(1.2); transform:translate(0); }
-      94%{ filter:saturate(.5) hue-rotate(100deg) brightness(1.15); transform:translate(-2px,1px); }
-      96%{ filter:saturate(0) brightness(.3); transform:translate(2px,-1px); }
+      0%,93%,100%{ filter:saturate(0.15) sepia(1) hue-rotate(320deg) brightness(0.7) contrast(1.2); transform:translate(0); }
+      94%{ filter:saturate(0.5) hue-rotate(100deg) brightness(1.15); transform:translate(-2px,1px); }
+      96%{ filter:saturate(0) brightness(0.3); transform:translate(2px,-1px); }
+      97%{ filter:saturate(0.15) sepia(1) hue-rotate(320deg) brightness(0.7); transform:translate(0); }
     }
-    .avatar::after {
+    .avatar-frame::after {
       content:''; position:absolute; inset:0;
-      background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(220,20,60,.04) 3px,rgba(220,20,60,.04) 4px);
+      background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(220,20,60,0.04) 3px,rgba(220,20,60,0.04) 4px);
+      pointer-events:none;
     }
-    .agent-handle {
-      font-family:var(--display); font-size:.72rem;
-      color:var(--green); letter-spacing:2.5px; text-transform:lowercase;
+
+    /* Agent info typography */
+    .agent-info .handle {
+      font-family:var(--f-display); font-size:0.72rem;
+      color:var(--c-primary); letter-spacing:2.5px; text-transform:lowercase;
+      text-shadow:0 0 8px rgba(57,255,133,0.3);
     }
-    .agent-name {
-      font-family:var(--vt); font-size:1.3rem;
-      color:var(--amber); letter-spacing:2px; margin-top:2px;
+    .agent-info .realname {
+      font-family:var(--f-vt); font-size:1.3rem;
+      color:var(--c-amber); letter-spacing:2px;
+      text-shadow:0 0 8px rgba(255,187,51,0.35);
+      margin-top:2px;
     }
-    .agent-role {
-      margin-top:6px; font-size:10px; color:var(--green3);
+    .agent-info .role-tag {
+      margin-top:6px; font-size:10px;
+      color: var(--c-muted);
       letter-spacing:1.5px;
-      border-left:1.5px solid rgba(220,20,60,.35);
+      border-left:1.5px solid rgba(220,20,60,0.35);
       padding-left:8px; line-height:1.75;
     }
-    .bio {
-      font-size:12px; color:var(--green2); line-height:1.72;
-      border-left:1px solid rgba(57,255,133,.15);
+
+    /* Bio */
+    .bio-text {
+      font-size:12px; color: var(--c-body); line-height:1.72;
+      border-left:1px solid rgba(57,255,133,0.15);
       padding-left:12px; margin-top:4px;
     }
 
-    /* Skills */
-    .skills-hd {
-      font-size:9px; letter-spacing:2.5px; color:var(--green4);
-      text-transform:uppercase; margin:16px 0 8px;
+    /* ══════════════════════════════════════════
+       SKILLS
+    ══════════════════════════════════════════ */
+    .skills-header {
+      font-size:9px; letter-spacing:2.5px;
+      color:var(--c-faint); text-transform:uppercase; margin:16px 0 8px;
     }
     .skills-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; }
-    .skill {
-      border:1px solid var(--border); padding:7px 9px;
-      font-size:11px; color:var(--green2); letter-spacing:1px;
-      transition:border-color .2s, color .2s, background .2s;
+    .skill-item {
+      border:1px solid var(--c-border); padding:7px 9px;
+      font-size:11px; color: var(--c-body);
+      letter-spacing:1px; cursor:default;
+      transition:border-color 0.2s, color 0.2s, background 0.2s;
     }
-    .skill::before { content:'> '; color:var(--green4); }
-    .skill:hover { border-color:rgba(255,34,68,.4); color:var(--red); background:rgba(255,34,68,.04); }
+    .skill-item::before { content:'> '; color:var(--c-faint); }
+    .skill-item:hover {
+      border-color:rgba(255,34,68,0.4);
+      color:var(--c-red);
+      background:rgba(255,34,68,0.04);
+    }
+    .skill-item:hover::before { color:var(--c-red); }
 
-    /* Project */
-    .project {
-      border:1px solid var(--border); padding:14px; margin-top:12px;
-      transition:border-color .3s, box-shadow .3s;
+    /* ══════════════════════════════════════════
+       PROGRESS BARS
+    ══════════════════════════════════════════ */
+    .progress-item { margin-bottom:9px; }
+    .progress-label {
+      display:flex; justify-content:space-between;
+      font-size:10px; color:var(--c-muted); margin-bottom:4px; letter-spacing:1px;
     }
-    .project:hover { border-color:rgba(220,20,60,.25); }
-    .proj-id { font-size:9px; color:var(--green4); letter-spacing:2.5px; margin-bottom:6px; }
-    .proj-id span { color:var(--red); }
-    .proj-name {
-      font-family:var(--display); font-size:.82rem;
-      color:var(--green); letter-spacing:2px; margin-bottom:7px; text-transform:lowercase;
+    .progress-label span:last-child { color:var(--c-red); }
+    .progress-track { height:3px; background:rgba(255,255,255,0.05); overflow:hidden; }
+    .progress-fill {
+      height:100%;
+      background:linear-gradient(90deg, var(--c-blood), var(--c-red), #ff6680);
+      box-shadow:0 0 6px rgba(255,34,68,0.4);
+      animation:load-bar 2s ease-out;
     }
-    .proj-desc { font-size:11.5px; color:var(--green2); line-height:1.68; margin-bottom:10px; }
-    .feat-list {
-      list-style:none; font-size:10.5px; color:var(--green2);
+    @keyframes load-bar { from{width:0%!important} }
+
+    /* ══════════════════════════════════════════
+       PROJECTS
+    ══════════════════════════════════════════ */
+    .project-entry {
+      border:1px solid var(--c-border); padding:14px; margin-top:12px;
+      transition:border-color 0.3s, box-shadow 0.3s;
+    }
+    .project-entry:hover { border-color:rgba(220,20,60,0.25); box-shadow:0 0 16px rgba(139,0,0,0.07); }
+    .project-id { font-size:9px; color:var(--c-faint); letter-spacing:2.5px; margin-bottom:6px; }
+    .project-id span { color:var(--c-red); }
+    .project-name {
+      font-family:var(--f-display); font-size:0.82rem;
+      color:var(--c-primary); letter-spacing:2px; margin-bottom:7px;
+      text-transform:lowercase;
+      text-shadow:0 0 8px rgba(57,255,133,0.25);
+    }
+    .project-desc { font-size:11.5px; color:var(--c-body); line-height:1.68; margin-bottom:10px; }
+    .feature-list {
+      list-style:none; font-size:10.5px; color:var(--c-body);
       display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-bottom:12px;
     }
-    .feat-list li::before { content:'[+] '; color:var(--green); }
-    .hack-btn {
-      display:inline-block; font-family:var(--mono); font-size:10.5px;
-      color:var(--green); border:1px solid rgba(57,255,133,.35);
-      padding:6px 14px; text-decoration:none; letter-spacing:1.5px; text-transform:uppercase;
-      transition:all .2s;
-    }
-    .hack-btn:hover { background:rgba(57,255,133,.07); color:#fff; }
+    .feature-list li::before { content:'[+] '; color:var(--c-primary); }
 
-    /* Stat block */
+    .hack-btn {
+      display:inline-block; font-family:var(--f-mono);
+      font-size:10.5px; color:var(--c-primary);
+      border:1px solid rgba(57,255,133,0.35);
+      padding:6px 14px; text-decoration:none;
+      letter-spacing:1.5px; text-transform:uppercase;
+      transition:all 0.2s;
+    }
+    .hack-btn:hover {
+      background:rgba(57,255,133,0.07);
+      box-shadow:0 0 14px rgba(57,255,133,0.15);
+      color:#fff; border-color:var(--c-primary);
+    }
+
+    /* ══════════════════════════════════════════
+       SIDEBAR — STAT BLOCK
+    ══════════════════════════════════════════ */
     .stat-block { font-size:11px; }
     .stat-row {
       display:flex; justify-content:space-between; align-items:center;
-      padding:7px 0; border-bottom:1px dashed rgba(57,255,133,.07);
+      padding:7px 0;
+      border-bottom:1px dashed rgba(57,255,133,0.07);
     }
     .stat-row:last-child { border-bottom:none; }
-    .stat-row .lbl { color:var(--green3); letter-spacing:1px; }
-    .stat-row .val { font-family:var(--vt); font-size:1rem; letter-spacing:2px; color:var(--green); }
-    .val.warn { color:var(--amber); }
-    .val.crit { color:var(--red); animation:blink 1.6s step-start infinite; }
+    .stat-row .label { color:var(--c-muted); letter-spacing:1px; }
+    .stat-row .val   { font-family:var(--f-vt); font-size:1rem; letter-spacing:2px; color:var(--c-primary); }
+    .stat-row .val.warn { color:var(--c-amber); }
+    .stat-row .val.crit { color:var(--c-red); animation:bdot 1.6s step-start infinite; }
 
-    /* Connect */
+    /* ══════════════════════════════════════════
+       CONNECT
+    ══════════════════════════════════════════ */
     .connect-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:4px; }
-    .c-link {
+    .connect-link {
       display:flex; align-items:center; gap:7px; padding:8px 9px;
-      border:1px solid var(--border); text-decoration:none;
-      color:var(--green2); font-size:11px; letter-spacing:1px;
-      transition:border-color .2s, color .2s, background .2s;
+      border:1px solid var(--c-border); text-decoration:none;
+      color:var(--c-body); font-size:11px; letter-spacing:1px;
+      transition:border-color 0.2s, color 0.2s, background 0.2s;
     }
-    .c-link:hover { border-color:rgba(220,20,60,.3); color:var(--red); background:rgba(220,20,60,.04); }
-    .c-link img { width:14px; height:14px; object-fit:contain; }
+    .connect-link:hover {
+      border-color:rgba(220,20,60,0.3);
+      color:var(--c-red); background:rgba(220,20,60,0.04);
+    }
+    .connect-link img { width:14px; height:14px; object-fit:contain; }
 
-    /* Activity log */
-    #act-log { font-size:10px; color:var(--green3); letter-spacing:1px; line-height:2.1; }
+    /* ══════════════════════════════════════════
+       CONTACT FORM
+    ══════════════════════════════════════════ */
+    .contact-form { display:flex; flex-direction:column; gap:7px; }
+    .hack-input,.hack-textarea {
+      background:rgba(4,10,4,0.95);
+      border:1px solid var(--c-border);
+      color:var(--c-body); font-family:var(--f-mono);
+      font-size:12px; padding:9px 11px; width:100%; outline:none;
+      transition:border-color 0.2s;
+    }
+    .hack-input:focus,.hack-textarea:focus {
+      border-color:rgba(220,20,60,0.45);
+    }
+    .hack-input::placeholder,.hack-textarea::placeholder {
+      color:var(--c-faint);
+    }
+    .hack-textarea { resize:vertical; min-height:80px; }
+    .hack-submit {
+      font-family:var(--f-mono); font-size:11px; color:#fff;
+      background:linear-gradient(90deg, var(--c-blood), var(--c-red));
+      border:none; padding:9px 16px; cursor:none;
+      letter-spacing:2px; text-transform:uppercase; font-weight:700;
+      transition:filter 0.2s;
+      box-shadow:0 0 14px rgba(139,0,0,0.3);
+    }
+    .hack-submit:hover { filter:brightness(1.18); }
 
-    /* Footer */
-    #footer {
-      margin-top:26px; border:1px solid rgba(220,20,60,.15);
+    /* ══════════════════════════════════════════
+       HEXDUMP DECORATION
+    ══════════════════════════════════════════ */
+    .hexdump {
+      font-size:8px; color:rgba(57,255,133,0.07);
+      letter-spacing:1.5px; line-height:2;
+      font-family:var(--f-mono); user-select:none; overflow:hidden; max-height:46px;
+    }
+
+    /* ══════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════ */
+    #site-footer {
+      margin-top:26px;
+      border:1px solid rgba(220,20,60,0.15);
       padding:12px 18px;
       display:flex; justify-content:space-between; align-items:center;
-      font-size:9.5px; color:var(--green3); letter-spacing:1.5px;
-      flex-wrap:wrap; gap:6px; background:rgba(4,0,1,.95);
+      font-size:9.5px; color:var(--c-muted); letter-spacing:1.5px;
+      flex-wrap:wrap; gap:6px;
+      background:rgba(4,0,1,0.95);
     }
     .footer-brand {
-      font-family:var(--display); font-size:.62rem;
-      color:var(--red); letter-spacing:3px; text-transform:lowercase;
+      font-family:var(--f-display); font-size:0.62rem;
+      color:var(--c-red); letter-spacing:3px;
+      text-transform:lowercase;
+      text-shadow:0 0 8px rgba(139,0,0,0.5);
     }
 
-    /* Footer install link */
-    #footer-install {
-      font-family:var(--mono); font-size:9px;
-      color:var(--green); background:transparent;
-      border:1px solid rgba(57,255,133,.2);
-      padding:4px 10px; cursor:pointer; letter-spacing:1.5px;
-      display:none; transition:all .2s;
-    }
-    #footer-install.show { display:inline-block; }
-    #footer-install:hover { background:rgba(57,255,133,.05); border-color:rgba(57,255,133,.4); }
-    @media (pointer:coarse) { #footer-install { cursor:pointer; } }
-
+    /* ══════════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════════ */
     @media(max-width:600px){
       .skills-grid{grid-template-columns:1fr 1fr}
-      .feat-list{grid-template-columns:1fr}
+      .feature-list{grid-template-columns:1fr}
       .connect-grid{grid-template-columns:1fr}
-      #t-body{padding:16px 14px 22px}
+      #terminal-body{padding:16px 14px 22px}
     }
   </style>
 </head>
 <body>
 
-<!-- BOOT -->
-<div id="boot">
+<!-- BOOT SCREEN -->
+<div id="boot-screen">
   <div id="boot-logo">
-    <img src="https://i.ibb.co/39F2XkQs/demonbazillionz.png" alt="logo">
+    <img src="https://i.ibb.co/39F2XkQs/demonbazillionz.png" alt="demonbazillionz logo">
   </div>
-  <div class="boot-line" style="color:#cc2233;animation-delay:.1s">initializing infernal systems...</div>
-  <div class="boot-line" style="color:#39ff85;animation-delay:.5s">checking service worker...</div>
-  <div class="boot-line" style="color:#aa1122;animation-delay:1s">daemon process attached</div>
+  <div class="boot-line" style="color:#cc2233;animation-delay:0.1s">initializing infernal systems...</div>
+  <div class="boot-line" style="color:#ffffff;animation-delay:0.5s">[████████████████████] 100%</div>
+  <div class="boot-line" style="color:#aa1122;animation-delay:1.0s">daemon process attached</div>
   <div class="boot-line" style="color:#663344;animation-delay:1.5s">warning: you have entered the abyss</div>
-  <div class="boot-line" style="color:#aa2233;animation-delay:2s">demonbazillionz — loading...</div>
-  <div id="boot-bar-wrap"><div id="boot-bar"></div></div>
+  <div class="boot-line" style="color:#aa2233;animation-delay:2.0s">demonbazillionz — loading...</div>
 </div>
 
 <!-- CURSOR -->
@@ -793,319 +758,160 @@
 <div id="lightning" aria-hidden="true"></div>
 
 <!-- SIGIL -->
-<svg id="sigil-bg" viewBox="0 0 200 200" fill="none" aria-hidden="true">
-  <circle cx="100" cy="100" r="95" stroke="#8b0000" stroke-width=".7"/>
-  <circle cx="100" cy="100" r="76" stroke="#8b0000" stroke-width=".3" stroke-dasharray="4,5"/>
+<svg id="sigil-bg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <circle cx="100" cy="100" r="95" stroke="#8b0000" stroke-width="0.7"/>
+  <circle cx="100" cy="100" r="76" stroke="#8b0000" stroke-width="0.3" stroke-dasharray="4,5"/>
   <polygon points="100,10 122,76 192,76 136,118 158,184 100,142 42,184 64,118 8,76 78,76"
-           stroke="#8b0000" stroke-width=".75" fill="rgba(139,0,0,.03)"/>
-  <line x1="100" y1="5"  x2="100" y2="195" stroke="#8b0000" stroke-width=".22" opacity=".35"/>
-  <line x1="5"  y1="100" x2="195" y2="100" stroke="#8b0000" stroke-width=".22" opacity=".35"/>
+           stroke="#8b0000" stroke-width="0.75" fill="rgba(139,0,0,0.03)"/>
+  <polygon points="100,40 113,68 145,68 121,86 130,114 100,96 70,114 79,86 55,68 87,68"
+           stroke="#8b0000" stroke-width="0.3" fill="none" opacity="0.45"/>
+  <line x1="100" y1="5"   x2="100" y2="195" stroke="#8b0000" stroke-width="0.22" opacity="0.35"/>
+  <line x1="5"   y1="100" x2="195" y2="100" stroke="#8b0000" stroke-width="0.22" opacity="0.35"/>
+  <line x1="28"  y1="28"  x2="172" y2="172" stroke="#8b0000" stroke-width="0.18" opacity="0.25"/>
+  <line x1="172" y1="28"  x2="28"  y2="172" stroke="#8b0000" stroke-width="0.18" opacity="0.25"/>
 </svg>
-
-<!-- ════════════════════════════════════════
-     UPDATE TOAST (SW update only — NOT install)
-════════════════════════════════════════ -->
-<div id="update-toast">
-  <div class="toast-ico">⬆</div>
-  <div class="toast-body">
-    <div class="toast-title">// update available</div>
-    <div class="toast-sub">version <span id="toast-ver">v6</span> — reloading in <span id="toast-cd">3</span>s</div>
-    <div class="toast-bar-wrap"><div class="toast-bar-fill" id="toast-bar"></div></div>
-  </div>
-  <div class="toast-btns">
-    <button class="toast-now" id="toast-now">↺ now</button>
-    <button class="toast-later" id="toast-later">later</button>
-  </div>
-</div>
-
-<!-- ════════════════════════════════════════
-     INSTALL MODAL
-     Hidden. Opens ONLY when user taps FAB
-     or footer button. Zero auto-popups.
-════════════════════════════════════════ -->
-<div id="install-modal">
-  <div class="im-backdrop" id="im-backdrop"></div>
-  <div class="im-box">
-
-    <div class="im-head">
-      <div class="im-head-title">// install as app</div>
-      <button class="im-close" id="im-close">[ × ]</button>
-    </div>
-
-    <div class="im-body">
-
-      <!-- What this does -->
-      <div class="im-info">
-        <b>✓ Real app</b> — lives in app drawer like native apps<br>
-        <b>✓ Fullscreen</b> — no browser address bar ever<br>
-        <b>✓ Offline</b> — works without internet after install<br>
-        <b>✓ Auto-updates</b> — always fresh, no reinstall needed
-      </div>
-
-      <!-- One-tap install button — only visible if browser supports it -->
-      <button id="im-onetap">⚡ install now — one tap</button>
-
-      <!-- Browser tabs -->
-      <div class="im-tabs">
-        <button class="im-tab" data-b="chrome">Chrome</button>
-        <button class="im-tab" data-b="brave">Brave</button>
-        <button class="im-tab" data-b="safari">iOS Safari</button>
-        <button class="im-tab" data-b="samsung">Samsung</button>
-        <button class="im-tab" data-b="edge">Edge</button>
-        <button class="im-tab" data-b="firefox">Firefox</button>
-      </div>
-
-      <!-- Chrome Android -->
-      <div class="im-steps" id="b-chrome">
-        <div class="step">
-          <div class="step-n">1</div>
-          <div class="step-t">Tap <b>⋮ menu</b> (top-right in Chrome)</div>
-        </div>
-        <div class="step">
-          <div class="step-n">2</div>
-          <div class="step-t">Tap <em>Add to Home screen</em></div>
-        </div>
-        <div class="step">
-          <div class="step-n">3</div>
-          <div class="step-t">On the dialog — tap <em>Install</em> <span class="note">This installs it as a real app in your app drawer — not just a bookmark shortcut</span></div>
-        </div>
-        <div class="step">
-          <div class="step-n">4</div>
-          <div class="step-t">Open from app drawer — launches fullscreen ✓</div>
-        </div>
-      </div>
-
-      <!-- Brave -->
-      <div class="im-steps" id="b-brave">
-        <div class="step">
-          <div class="step-n">1</div>
-          <div class="step-t">Tap <b>⋮ menu</b> top-right (Android) or <b>☰</b> bottom (iOS)</div>
-        </div>
-        <div class="step">
-          <div class="step-n">2</div>
-          <div class="step-t">Tap <em>Install App</em> or <em>Add to Home Screen</em></div>
-        </div>
-        <div class="step">
-          <div class="step-n">3</div>
-          <div class="step-t">Tap <em>Install</em> on the dialog — installs to app drawer <span class="note">Brave blocks the auto-prompt by design — manual menu install still works</span></div>
-        </div>
-      </div>
-
-      <!-- iOS Safari -->
-      <div class="im-steps" id="b-safari">
-        <div class="step">
-          <div class="step-n">!</div>
-          <div class="step-t"><b>Must use Safari</b> — Chrome &amp; Brave on iOS cannot install PWAs</div>
-        </div>
-        <div class="step">
-          <div class="step-n">1</div>
-          <div class="step-t">Tap the <b>Share ↑</b> button at the bottom of Safari</div>
-        </div>
-        <div class="step">
-          <div class="step-n">2</div>
-          <div class="step-t">Tap <em>Add to Home Screen</em> <span class="note">On iOS this is the real app install — it also appears in your App Library</span></div>
-        </div>
-        <div class="step">
-          <div class="step-n">3</div>
-          <div class="step-t">Tap <em>Add</em> — opens fullscreen like a native app ✓</div>
-        </div>
-      </div>
-
-      <!-- Samsung -->
-      <div class="im-steps" id="b-samsung">
-        <div class="step">
-          <div class="step-n">1</div>
-          <div class="step-t">Tap <b>☰ menu</b> bottom-right in Samsung Internet</div>
-        </div>
-        <div class="step">
-          <div class="step-n">2</div>
-          <div class="step-t">Tap <em>Add page to</em> → select <em>Apps screen</em> <span class="note">Choose "Apps screen" not "Home screen" — Apps screen = real app in drawer</span></div>
-        </div>
-        <div class="step">
-          <div class="step-n">3</div>
-          <div class="step-t">Tap <em>Add</em> — find in app drawer, opens fullscreen ✓</div>
-        </div>
-      </div>
-
-      <!-- Edge -->
-      <div class="im-steps" id="b-edge">
-        <div class="step">
-          <div class="step-n">1</div>
-          <div class="step-t">Tap <b>⋯ menu</b> (mobile: bottom bar / desktop: top-right)</div>
-        </div>
-        <div class="step">
-          <div class="step-n">2</div>
-          <div class="step-t">Tap <em>Apps</em> → <em>Install this site as an app</em></div>
-        </div>
-        <div class="step">
-          <div class="step-n">3</div>
-          <div class="step-t">Tap <em>Install</em> — added to apps, opens in own window ✓</div>
-        </div>
-      </div>
-
-      <!-- Firefox -->
-      <div class="im-steps" id="b-firefox">
-        <div class="step">
-          <div class="step-n">1</div>
-          <div class="step-t">Tap <b>⋮ menu</b> top-right on Android</div>
-        </div>
-        <div class="step">
-          <div class="step-n">2</div>
-          <div class="step-t">Tap <em>Install</em> or <em>Add to Home Screen</em></div>
-        </div>
-        <div class="step">
-          <div class="step-n">!</div>
-          <div class="step-t"><b>Recommended:</b> use Chrome or Edge for the best real-app experience</div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- ════════════════════════════════════════
-     FLOATING INSTALL BUTTON
-     Appears after boot. Zero auto-popup.
-     User taps this to open install modal.
-════════════════════════════════════════ -->
-<button id="install-fab" aria-label="Install as app">
-  <span class="fab-dot"></span>
-  ⬇ install app
-</button>
 
 <!-- PAGE -->
 <div id="page">
 
+  <!-- ACCESS BAR -->
   <div id="access-bar">
-    <div><span class="blink-dot"></span><span class="s-err">infernal channel open</span></div>
-    <div class="s-ok" id="visitor-ip">ip: 0.0.0.0 — traced</div>
-    <div id="clock" class="s-warn">--:--:-- utc</div>
+    <div><span class="blink-dot"></span><span class="s-evil">infernal channel open</span></div>
+    <div class="s-ok" id="visitor-ip">node: — anonymous</div>
+    <div id="clock-display" class="s-warn">--:--:-- utc</div>
   </div>
 
-  <div id="terminal">
-    <div id="t-bar">
-      <span class="wb wb-r"></span>
-      <span class="wb wb-y"></span>
-      <span class="wb wb-g"></span>
+  <!-- TERMINAL FRAME -->
+  <div id="terminal-frame">
+    <div id="terminal-titlebar">
+      <span class="win-btn wb-close"></span>
+      <span class="win-btn wb-min"></span>
+      <span class="win-btn wb-max"></span>
       &nbsp;&nbsp;
-      <span style="color:rgba(255,80,100,.6)">root@demonbazillionz</span>
-      <span style="color:var(--green)">:~$</span>
-      <span style="color:rgba(187,85,255,.5);margin-left:auto">dark arts terminal v6.6.6</span>
+      <span style="color:rgba(255,80,100,0.6)">root@demonbazillionz</span>
+      <span style="color:var(--c-primary)">:~$</span>
+      &nbsp;
+      <span style="color:rgba(187,85,255,0.5);margin-left:auto">dark arts terminal v6.6.6</span>
     </div>
-    <div id="t-body">
+
+    <div id="terminal-body">
       <div id="title-wrap">
         <h1 id="site-title" data-text="demonbazillionz">demonbazillionz</h1>
-        <div class="demon-sub">NITHIN B N</div>
+        <div class="demon-subtitle">NITHIN B N </div>
         <div id="penta-wrap">
-          <svg id="penta-svg" viewBox="0 0 100 100" fill="none">
+          <svg id="penta-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="50" cy="50" r="47" stroke="#8b0000" stroke-width="1"/>
             <polygon points="50,6 62,38 96,38 69,59 80,92 50,71 20,92 31,59 4,38 38,38"
-                     stroke="#cc0022" stroke-width="1" fill="rgba(139,0,0,.06)"/>
+                     stroke="#cc0022" stroke-width="1" fill="rgba(139,0,0,0.06)"/>
           </svg>
-          <svg id="penta-inner" viewBox="0 0 100 100" fill="none">
-            <circle cx="50" cy="50" r="30" stroke="rgba(187,85,255,.5)" stroke-width=".7" stroke-dasharray="3,3"/>
+          <svg id="penta-inner" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="30" stroke="rgba(187,85,255,0.5)" stroke-width="0.7" stroke-dasharray="3,3"/>
           </svg>
         </div>
       </div>
 
-      <div id="warn-banner">
-        <i class="fas fa-radiation" style="color:var(--red);animation:blink 1s step-start infinite"></i>
+      <div id="warning-banner">
+        <i class="fas fa-radiation warn-icon"></i>
         <span>classified — educational &amp; research use only — unauthorized access prohibited</span>
       </div>
 
       <div class="prompt-line">
         <span class="ps1">root@demonbazillionz<span>:~$</span></span>
-        <span id="typing-out"></span><span id="caret"></span>
+        <span id="typing-output"></span><span id="caret"></span>
       </div>
 
       <div class="hexdump" style="margin-top:14px">
         44 65 6d 6f 6e 42 61 7a 69 6c 6c 69 6f 6e 7a 20 7c 20 4e 69 74 68 69 6e 20 42 4e 20 7c 20 53 65 63 4f 70 73
+        52 65 76 45 6e 67 20 7c 20 45 74 68 69 63 61 6c 20 48 61 63 6b 69 6e 67 20 7c 20 44 61 72 6b 57 65 62 20 4f 70 73
       </div>
     </div>
   </div>
 
-  <div id="ticker">
-    <span class="tick-inner">
-      <span class="s-err">[daemon]</span> pid 666 attached &nbsp;|&nbsp;
-      <span class="s-ok">[ok]</span> pwa v6 — one install forever &nbsp;|&nbsp;
-      <span class="s-evil">[soul]</span> visitor #<span id="soul-id">???</span> catalogued &nbsp;|&nbsp;
-      <span class="s-warn">[warn]</span> anomalous entity port 6666 &nbsp;|&nbsp;
-      <span class="s-ok">[ok]</span> service worker active &nbsp;|&nbsp;
-      <span class="s-warn">[sys]</span> matrix 60fps &nbsp;|&nbsp;
-      <span class="s-ok">[ok]</span> offline cache primed
+  <!-- LOG TICKER -->
+  <div id="log-ticker">
+    <span class="ticker-inner">
+      <span class="t-err">[daemon]</span> attached to pid 666 &nbsp;|&nbsp;
+      <span class="t-ok">[ok]</span> service-worker summoned &nbsp;|&nbsp;
+      <span class="t-evil">[soul]</span> visitor catalogued — id #<span id="soul-id">???</span> &nbsp;|&nbsp;
+      <span class="t-warn">[warn]</span> anomalous entity on port 6666 &nbsp;|&nbsp;
+      <span class="t-err">[!]</span> infernal packet blocked &nbsp;|&nbsp;
+      <span class="t-ok">[ok]</span> tls handshake verified &nbsp;|&nbsp;
+      <span class="t-warn">[sys]</span> matrix rain: 60fps &nbsp;|&nbsp;
+      <span class="t-ok">[ok]</span> ethical mode enabled
     </span>
   </div>
 
-  <div id="soul-bar">
+  <!-- SOUL COUNTER -->
+  <div id="soul-counter">
     <span>souls harvested this session</span>
-    <span id="soul-val">000000</span>
-    <span style="color:var(--violet);animation:blink 1.9s step-start infinite">☠</span>
+    <span id="soul-count-val">000000</span>
+    <span class="soul-skull">x</span>
   </div>
 
-  <div class="divider">0x666 — infernal profile dump</div>
+  <div class="hex-divider">0x666 — infernal profile dump</div>
 
-  <div class="grid">
+  <!-- MAIN GRID -->
+  <div class="main-grid">
 
     <!-- LEFT -->
-    <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;flex-direction:column;gap:16px;">
 
-      <!-- AGENT -->
+      <!-- AGENT PROFILE -->
       <div class="panel">
         <div class="corner-bl"></div>
-        <div class="p-head">
-          <i class="fas fa-ghost p-icon"></i>
+        <div class="panel-header">
+          <i class="fas fa-ghost ph-icon"></i>
           agent dossier
-          <span class="p-tag">id::0x001</span>
+          <span class="ph-tag">id::0x001</span>
         </div>
-        <div class="p-body">
-          <div class="about-row">
-            <div class="avatar">
+        <div class="panel-body">
+          <div class="about-grid">
+            <div class="avatar-frame">
               <img src="https://i.ibb.co/39F2XkQs/demonbazillionz.png" alt="demonbazillionz">
             </div>
-            <div>
-              <div class="agent-handle">demonbazillionz</div>
-              <div class="agent-name">NITHIN B N</div>
-              <div class="agent-role">
+            <div class="agent-info">
+              <div class="handle">demonbazillionz</div>
+              <div class="realname">NITHIN B N</div>
+              <div class="role-tag">
                 // cybersecurity enthusiast<br>
                 // reverse engineer<br>
                 // ethical hacker
               </div>
             </div>
           </div>
-          <p class="bio" style="margin-top:14px">
+          <p class="bio-text" style="margin-top:14px">
             Practical security research, penetration testing, mobile app reverse engineering,
             blockchain experiments, and embedded systems exploration.
             Every binary is a spell. Every exploit is a ritual. One shell at a time.
           </p>
-          <div class="skills-hd">// skills modules</div>
-          <div class="skills-grid">
-            <div class="skill">sleep</div>
-            <div class="skill">eat</div>
-            <div class="skill">breath</div>
-            <div class="skill">drink</div>
-            <div class="skill">hunt</div>
-            <div class="skill">earn</div>
-          </div>
-        </div>
-      </div>
 
+          <div class="skills-header">// skills modules</div>
+          <div class="skills-grid">
+            <div class="skill-item">sleep</div>
+            <div class="skill-item">eat</div>
+            <div class="skill-item">breath</div>
+            <div class="skill-item">drink</div>
+            <div class="skill-item">hunt</div>
+            <div class="skill-item">earn</div>
+          </div>
+          
       <!-- PROJECTS -->
-      <div class="panel" id="projects">
+      <div class="panel">
         <div class="corner-bl"></div>
-        <div class="p-head">
-          <i class="fas fa-code-branch p-icon"></i>
+        <div class="panel-header">
+          <i class="fas fa-code-branch ph-icon"></i>
           project registry
-          <span class="p-tag">id::0x002</span>
+          <span class="ph-tag">id::0x002</span>
         </div>
-        <div class="p-body">
-          <div class="project">
-            <div class="proj-id">proj_<span>001</span> · status: <span style="color:var(--green)">active</span></div>
-            <div class="proj-name">stretchsquare</div>
-            <p class="proj-desc">
+        <div class="panel-body">
+          <div class="project-entry">
+            <div class="project-id">proj_<span>001</span> &nbsp;·&nbsp; status: <span style="color:var(--c-primary)">active</span></div>
+            <div class="project-name">stretchsquare</div>
+            <p class="project-desc">
               A fast, beginner-friendly 1:1 video conversion tool built on Python + FFmpeg.
               Drag-and-drop interface, portable — no installation required.
             </p>
-            <ul class="feat-list">
+            <ul class="feature-list">
               <li>Drag &amp; Drop input</li>
               <li>1:1 Square output</li>
               <li>Clean dark GUI</li>
@@ -1115,7 +921,7 @@
               <li>Windows 10/11</li>
               <li>Fast processing</li>
             </ul>
-            <a href="https://github.com/demonbazillionz/StretchSquare" target="_blank" class="hack-btn">
+            <a href="https://github.com/demonbazillionz/StretchSquare" target="_blank" rel="noopener noreferrer" class="hack-btn">
               <i class="fab fa-github"></i> &nbsp; access repository
             </a>
           </div>
@@ -1125,30 +931,30 @@
     </div>
 
     <!-- SIDEBAR -->
-    <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;flex-direction:column;gap:14px;">
 
       <!-- CONNECT -->
       <div class="panel">
         <div class="corner-bl"></div>
-        <div class="p-head">
-          <i class="fas fa-network-wired p-icon"></i>
+        <div class="panel-header">
+          <i class="fas fa-network-wired ph-icon"></i>
           network nodes
         </div>
-        <div class="p-body">
+        <div class="panel-body">
           <div class="connect-grid">
-            <a href="https://github.com/demonbazillionz" target="_blank" class="c-link">
+            <a href="https://github.com/demonbazillionz" target="_blank" rel="noopener noreferrer" class="connect-link">
               <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" style="filter:invert(1)" alt="GitHub"> GitHub
             </a>
-            <a href="https://www.linkedin.com/in/demonbazillionz/" target="_blank" class="c-link">
+            <a href="https://www.linkedin.com/in/demonbazillionz/" target="_blank" rel="noopener noreferrer" class="connect-link">
               <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn"> LinkedIn
             </a>
-            <a href="https://bsky.app/profile/demonbazillionz.bsky.social" target="_blank" class="c-link">
+            <a href="https://bsky.app/profile/demonbazillionz.bsky.social" target="_blank" rel="noopener noreferrer" class="connect-link">
               <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Bluesky_Logo.svg" alt="Bluesky"> Bluesky
             </a>
-            <a href="https://open.spotify.com/user/316c6a2x4wtcd6xbfp2h6skz4u4e" target="_blank" class="c-link">
+            <a href="https://open.spotify.com/user/316c6a2x4wtcd6xbfp2h6skz4u4e" target="_blank" rel="noopener noreferrer" class="connect-link">
               <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Spotify"> Spotify
             </a>
-            <a href="https://pin.it/4CozzEE0W" target="_blank" class="c-link">
+            <a href="https://pin.it/4CozzEE0W" target="_blank" rel="noopener noreferrer" class="connect-link">
               <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Pinterest-logo.png" alt="Pinterest"> Pinterest
             </a>
           </div>
@@ -1158,43 +964,50 @@
       <!-- STATUS -->
       <div class="panel">
         <div class="corner-bl"></div>
-        <div class="p-head"><i class="fas fa-skull p-icon"></i> sys status</div>
-        <div class="p-body stat-block">
-          <div class="stat-row"><span class="lbl">daemon</span>  <span class="val crit">active</span></div>
-          <div class="stat-row"><span class="lbl">tls</span>     <span class="val">sealed</span></div>
-          <div class="stat-row"><span class="lbl">pwa</span>     <span class="val" id="pwa-st">checking</span></div>
-          <div class="stat-row"><span class="lbl">sw</span>      <span class="val" id="sw-st">loading</span></div>
-          <div class="stat-row"><span class="lbl">fps</span>     <span class="val">60</span></div>
-          <div class="stat-row"><span class="lbl">threat</span> <span class="val warn">infernal</span></div>
-          <div class="stat-row"><span class="lbl">offline</span><span class="val" id="off-st">cached</span></div>
+        <div class="panel-header">
+          <i class="fas fa-skull ph-icon"></i>
+          sys status
+        </div>
+        <div class="panel-body stat-block">
+          <div class="stat-row"><span class="label">daemon</span><span class="val crit">active</span></div>
+          <div class="stat-row"><span class="label">tls</span><span class="val">sealed</span></div>
+          <div class="stat-row"><span class="label">sw cache</span><span class="val">primed</span></div>
+          <div class="stat-row"><span class="label">matrix fps</span><span class="val">60</span></div>
+          <div class="stat-row"><span class="label">threat lvl</span><span class="val warn">infernal</span></div>
+          <div class="stat-row"><span class="label">firewall</span><span class="val">active</span></div>
+          <div class="stat-row"><span class="label">exorcisms</span><span class="val crit">1 blocked</span></div>
         </div>
       </div>
 
       <!-- ACTIVITY LOG -->
       <div class="panel">
         <div class="corner-bl"></div>
-        <div class="p-head"><i class="fas fa-scroll p-icon"></i> daemon log</div>
-        <div class="p-body">
-          <div id="act-log">
-            <div><span class="s-ok">[ok]</span> StretchSquare v1.0 shipped</div>
-            <div><span class="s-ok">[ok]</span> PWA v6 deployed</div>
-            <div><span class="s-evil">[!]</span> daemon process attached</div>
-            <div><span class="s-warn">[lrn]</span> studying binary exploitation</div>
-            <div><span class="s-warn">[lrn]</span> Android APK reversing</div>
-            <div><span class="s-err">[new]</span> site v5.0 — demon edition</div>
+        <div class="panel-header">
+          <i class="fas fa-scroll ph-icon"></i>
+          daemon log
+        </div>
+        <div class="panel-body">
+          <div id="activity-log" style="font-size:10px;color:var(--c-muted);letter-spacing:1px;line-height:2.1">
+            <div><span class="t-ok">[ok]</span> StretchSquare v1.0 shipped</div>
+            <div><span class="t-ok">[ok]</span> PWA manifest deployed</div>
+            <div><span class="t-evil">[!]</span> daemon process attached</div>
+            <div><span class="t-warn">[lrn]</span> studying binary exploitation</div>
+            <div><span class="t-warn">[lrn]</span> Android APK reversing</div>
+            <div><span class="t-err">[new]</span> site v4.0 — demon edition</div>
           </div>
         </div>
       </div>
 
       <!-- LEGAL -->
-      <div class="panel" style="border-color:rgba(139,0,0,.14)">
+      <div class="panel" style="border-color:rgba(139,0,0,0.14)">
         <div class="corner-bl"></div>
-        <div class="p-head" style="border-color:rgba(139,0,0,.14);color:rgba(255,100,120,.6);font-size:9px">
-          <i class="fas fa-exclamation-triangle" style="color:var(--red)"></i>
+        <div class="panel-header" style="border-color:rgba(139,0,0,0.14);color:rgba(255,100,120,0.6)">
+          <i class="fas fa-exclamation-triangle" style="color:var(--c-red);font-size:10px"></i>
           legal notice
         </div>
-        <div class="p-body" style="font-size:10px;color:var(--green3);letter-spacing:1px;line-height:1.75;opacity:.7">
-          Educational and experimental purposes only. All research conducted ethically.
+        <div class="panel-body" style="font-size:10px;color:var(--c-muted);letter-spacing:1px;line-height:1.75;opacity:0.7">
+          Certain information may be fictional — educational and experimental purposes only.
+          All research conducted ethically.
         </div>
       </div>
 
@@ -1202,175 +1015,206 @@
   </div>
 
   <!-- FOOTER -->
-  <div id="footer">
+  <div id="site-footer">
     <div class="footer-brand">demonbazillionz</div>
-    <div style="color:var(--green3)">© demonbazillionz · learning &amp; responsible research</div>
-    <div style="display:flex;align-items:center;gap:10px">
-      <button id="footer-install">⬇ install app</button>
-      <span><span class="s-err">root@hell:~$</span> <span style="color:var(--green4)">exit 0</span></span>
+    <div style="text-align:center;color:var(--c-muted)">
+      copyright demonbazillionz &nbsp;·&nbsp; built for learning &amp; responsible research
     </div>
+    <div><span class="t-err">root@hell:~$</span> <span style="color:var(--c-faint)">exit 0</span></div>
   </div>
 
 </div><!-- /page -->
 
 <script src="matrix.js"></script>
 <script>
-/* ════════════════════════════════════════
-   BOOT
-════════════════════════════════════════ */
-(function () {
-  var bar = document.getElementById('boot-bar');
-  var p = 0;
-  var iv = setInterval(function () {
-    p = Math.min(100, p + Math.random() * 18 + 5);
-    bar.style.width = p + '%';
-    if (p >= 100) clearInterval(iv);
-  }, 120);
+/* ── BOOT ── */
+const boot = document.getElementById('boot-screen');
+setTimeout(() => {
+  boot.classList.add('fade-out');
+  setTimeout(() => boot.style.display = 'none', 750);
+}, 3000);
 
-  setTimeout(function () {
-    var boot = document.getElementById('boot');
-    boot.classList.add('out');
-    setTimeout(function () { boot.style.display = 'none'; }, 750);
-  }, 3000);
+/* ── CURSOR (transform-based, GPU composited) ── */
+const cur = document.getElementById('cursor');
+const TRAIL_N = 7;
+const trailEls = [];
+for (let i = 0; i < TRAIL_N; i++) {
+  const t = document.createElement('div');
+  t.className = 'cursor-trail';
+  document.body.appendChild(t);
+  trailEls.push(t);
+}
+let mx = 0, my = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+cur.style.cssText = 'position:fixed;top:0;left:0;pointer-events:none;z-index:99999;font-size:15px;color:#ff2244;will-change:transform;';
+trailEls.forEach(t => {
+  t.style.cssText = 'position:fixed;top:0;left:0;pointer-events:none;z-index:99998;border-radius:50%;width:4px;height:4px;background:#ff2244;will-change:transform,opacity;';
+});
+
+let trailX = Array(TRAIL_N).fill(0), trailY = Array(TRAIL_N).fill(0);
+(function animCursor() {
+  cur.style.transform = `translate(${mx}px,${my}px) translate(-50%,-50%)`;
+  let lx = mx, ly = my;
+  for (let i = 0; i < TRAIL_N; i++) {
+    trailX[i] += (lx - trailX[i]) * 0.3;
+    trailY[i] += (ly - trailY[i]) * 0.3;
+    lx = trailX[i]; ly = trailY[i];
+    const f = 1 - i / TRAIL_N;
+    trailEls[i].style.transform = `translate(${trailX[i]}px,${trailY[i]}px) translate(-50%,-50%) scale(${f * 0.8 + 0.2})`;
+    trailEls[i].style.opacity = f * 0.45;
+  }
+  requestAnimationFrame(animCursor);
 })();
 
-/* ════════════════════════════════════════
-   CURSOR
-════════════════════════════════════════ */
-(function () {
-  if (!window.matchMedia('(pointer:fine)').matches) return;
-  var cur = document.getElementById('cursor');
-  var mx = 0, my = 0;
-  document.addEventListener('mousemove', function (e) { mx = e.clientX; my = e.clientY; });
-  (function loop() {
-    cur.style.transform = 'translate(' + mx + 'px,' + my + 'px) translate(-50%,-50%)';
-    requestAnimationFrame(loop);
-  })();
-})();
-
-/* ════════════════════════════════════════
-   GHOST PARTICLES
-════════════════════════════════════════ */
-document.addEventListener('click', function (e) {
-  var syms = ['x','+','~','!','#','%'];
-  var cols = ['#ff2244','#bb55ff','#39ff85'];
-  for (var i = 0; i < 3; i++) {
-    var g = document.createElement('div');
-    g.className = 'ghost';
-    g.textContent = syms[Math.floor(Math.random() * syms.length)];
-    g.style.color = cols[Math.floor(Math.random() * cols.length)];
-    g.style.left = (e.clientX + (Math.random() - .5) * 40) + 'px';
-    g.style.top  = (e.clientY + (Math.random() - .5) * 24) + 'px';
+/* ── GHOST PARTICLES on click ── */
+const GHOSTS = ['x', '+', '~', '!', '#', '%'];
+document.addEventListener('click', e => {
+  for (let i = 0; i < 3; i++) {
+    const g = document.createElement('div');
+    g.className = 'ghost-particle';
+    g.textContent = GHOSTS[Math.floor(Math.random() * GHOSTS.length)];
+    g.style.color = ['#ff2244','#bb55ff','#39ff85'][Math.floor(Math.random() * 3)];
+    g.style.left = (e.clientX + (Math.random() - 0.5) * 40) + 'px';
+    g.style.top  = (e.clientY + (Math.random() - 0.5) * 24) + 'px';
     g.style.animationDuration = (1.5 + Math.random() * 1.2) + 's';
     document.body.appendChild(g);
-    setTimeout(function () { g.remove(); }, 2500);
+    setTimeout(() => g.remove(), 2500);
   }
 });
 
-/* ════════════════════════════════════════
-   BLOOD DRIP
-════════════════════════════════════════ */
+/* ── BLOOD DRIP (throttled) ── */
 (function () {
-  var c = document.getElementById('blood-canvas');
+  const c = document.getElementById('blood-canvas');
   if (!c) return;
-  var ctx = c.getContext('2d');
-  var drips = [], spawnT = 0, lastT = 0;
-  function resize() { c.width = innerWidth; c.height = innerHeight; }
-  resize(); window.addEventListener('resize', resize);
+  const ctx = c.getContext('2d');
+  function resize() { c.width = window.innerWidth; c.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const drips = [];
+  let spawnTimer = 0;
+  const SPAWN_INTERVAL = 1400;
+  let lastTime = 0;
+
   function draw(ts) {
-    var dt = Math.min(ts - lastT, 50); lastT = ts;
+    const dt = Math.min(ts - lastTime, 50); // cap dt so tab-switch doesn't cause big jumps
+    lastTime = ts;
     ctx.clearRect(0, 0, c.width, c.height);
-    spawnT += dt;
-    if (spawnT >= 1400) {
-      spawnT = 0;
-      drips.push({ x:Math.random()*c.width, y:0, vy:.35+Math.random()*.4,
-        r:1.5+Math.random()*1.8, len:0, maxLen:28+Math.random()*65, alpha:.22+Math.random()*.28 });
+
+    spawnTimer += dt;
+    if (spawnTimer >= SPAWN_INTERVAL) {
+      spawnTimer = 0;
+      drips.push({
+        x: Math.random() * c.width,
+        y: 0, vy: 0.35 + Math.random() * 0.4,
+        r: 1.5 + Math.random() * 1.8,
+        len: 0, maxLen: 28 + Math.random() * 65,
+        alpha: 0.22 + Math.random() * 0.28
+      });
     }
-    for (var i = drips.length - 1; i >= 0; i--) {
-      var d = drips[i]; d.y += d.vy; d.len += d.vy;
+
+    for (let i = drips.length - 1; i >= 0; i--) {
+      const d = drips[i];
+      d.y += d.vy; d.len += d.vy;
       if (d.len >= d.maxLen) { drips.splice(i, 1); continue; }
-      ctx.beginPath(); ctx.moveTo(d.x, d.y - d.len); ctx.lineTo(d.x, d.y);
-      ctx.strokeStyle = 'rgba(139,0,0,' + (d.alpha * .5) + ')';
-      ctx.lineWidth = d.r * .5; ctx.stroke();
-      ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(160,0,0,' + d.alpha + ')'; ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(d.x, d.y - d.len);
+      ctx.lineTo(d.x, d.y);
+      ctx.strokeStyle = `rgba(139,0,0,${d.alpha * 0.5})`;
+      ctx.lineWidth = d.r * 0.5;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(160,0,0,${d.alpha})`;
+      ctx.fill();
     }
     requestAnimationFrame(draw);
   }
   requestAnimationFrame(draw);
 })();
 
-/* ── Lightning ── */
+/* ── LIGHTNING ── */
 (function () {
-  var el = document.getElementById('lightning');
+  const el = document.getElementById('lightning');
   function strike() {
-    el.style.background = 'rgba(' + (Math.random() > .5 ? '100,0,200' : '180,15,40') + ',.04)';
+    el.style.background = `rgba(${Math.random() > 0.5 ? '100,0,200' : '180,15,40'},0.04)`;
     el.style.opacity = '1';
-    setTimeout(function () { el.style.opacity = '0'; }, 50);
-    setTimeout(function () {
-      el.style.opacity = '.5';
-      setTimeout(function () { el.style.opacity = '0'; }, 35);
+    setTimeout(() => el.style.opacity = '0', 50);
+    setTimeout(() => {
+      el.style.opacity = '0.5';
+      setTimeout(() => el.style.opacity = '0', 35);
     }, 90);
     setTimeout(strike, 7000 + Math.random() * 18000);
   }
   setTimeout(strike, 5000);
 })();
 
-/* ── Title invert flash ── */
+/* ── TITLE INVERT FLASH ── */
 (function () {
-  var t = document.getElementById('site-title');
+  const t = document.getElementById('site-title');
   function flash() {
     t.classList.add('inv');
-    setTimeout(function () { t.classList.remove('inv'); }, 70);
+    setTimeout(() => t.classList.remove('inv'), 70);
     setTimeout(flash, 10000 + Math.random() * 16000);
   }
   setTimeout(flash, 7000);
 })();
 
-/* ── Clock ── */
-(function () {
-  function tick() {
-    var n = new Date(), p = function (v) { return String(v).padStart(2,'0'); };
-    document.getElementById('clock').textContent =
-      p(n.getUTCHours()) + ':' + p(n.getUTCMinutes()) + ':' + p(n.getUTCSeconds()) + ' utc';
-  }
-  tick(); setInterval(tick, 1000);
+/* ── UTC CLOCK ── */
+function updateClock() {
+  const n = new Date(), p = v => String(v).padStart(2, '0');
+  document.getElementById('clock-display').textContent =
+    p(n.getUTCHours()) + ':' + p(n.getUTCMinutes()) + ':' + p(n.getUTCSeconds()) + ' utc';
+}
+setInterval(updateClock, 1000); updateClock();
+
+/* ── ANONYMOUS NODE DISPLAY (no fake surveillance claims) ── */
+(function() {
+  const el = document.getElementById('visitor-ip');
+  if (!el) return;
+  // Display anonymised node ID — purely decorative, no user data collected
+  const hex = () => Math.floor(Math.random()*256).toString(16).padStart(2,'0');
+  el.textContent = 'node: ' + [hex(),hex(),hex(),hex()].join(':') + ' — anonymous';
 })();
 
-/* ── Fake IP ── */
-(function () {
-  function gen() {
-    var s = [0,0,0,0].map(function () { return Math.floor(Math.random()*255); });
-    document.getElementById('visitor-ip').textContent = 'ip: ' + s.join('.') + ' — traced';
-  }
-  gen(); setInterval(function () { if (Math.random() < .1) gen(); }, 5000);
-})();
+/* ── SOUL COUNTER ── */
+let souls = 0;
+const soulEl = document.getElementById('soul-count-val');
+const soulId = document.getElementById('soul-id');
+if (soulId) soulId.textContent = Math.floor(Math.random() * 9999);
+function incSouls() {
+  souls += Math.floor(Math.random() * 3) + 1;
+  soulEl.textContent = String(souls).padStart(6, '0');
+  setTimeout(incSouls, 2800 + Math.random() * 5000);
+}
+setTimeout(incSouls, 4000);
 
-/* ── Soul counter ── */
+/* ── TYPING ANIMATION (XSS-safe: textContent only) ── */
 (function () {
-  var souls = 0;
-  var el = document.getElementById('soul-val');
-  document.getElementById('soul-id').textContent = Math.floor(Math.random() * 9999);
-  function inc() {
-    souls += Math.floor(Math.random() * 3) + 1;
-    el.textContent = String(souls).padStart(6,'0');
-    setTimeout(inc, 2800 + Math.random() * 5000);
-  }
-  setTimeout(inc, 4000);
-})();
-
-/* ── Typing ── */
-(function () {
-  var el = document.getElementById('typing-out');
-  var lines = ['whoami','','  demonbazillionz','  cybersecurity enthusiast in the digital abyss.',
-    '  hacking · pentesting · app modding · blockchain.','',
-    '  i build, audit, and secure software.','  learning by doing — one shell at a time. :)'];
-  var full = lines.join('\n'), i = 0;
+  const el = document.getElementById('typing-output');
+  if (!el) return;
+  const lines = [
+    'whoami', '',
+    '  demonbazillionz',
+    '  cybersecurity enthusiast in the digital abyss.',
+    '  hacking · pentesting · app modding · blockchain.',
+    '',
+    '  i build, audit, and secure software.',
+    '  learning by doing — one shell at a time. :)'
+  ];
+  const full = lines.join('\n');
+  let i = 0;
+  // Use safe text nodes + br elements — no innerHTML
   function type() {
     if (i < full.length) {
-      var ch = full.charAt(i++);
-      el.innerHTML += ch === '\n' ? '<br>' : ch;
-      var d = 14 + Math.random() * 30;
+      const ch = full.charAt(i++);
+      if (ch === '\n') {
+        el.appendChild(document.createElement('br'));
+      } else {
+        el.appendChild(document.createTextNode(ch));
+      }
+      let d = 14 + Math.random() * 30;
       if (ch === ' ') d += 10;
       if (ch === '.' || ch === '\n') d += 80;
       setTimeout(type, d);
@@ -1379,235 +1223,72 @@ document.addEventListener('click', function (e) {
   setTimeout(type, 3200);
 })();
 
-/* ── Activity log ── */
-var logPool = [
-  ['s-evil','daemon heartbeat — still alive'],
-  ['s-warn','port scan detected — logged'],
-  ['s-ok','checksum verified — all clear'],
-  ['s-err','exorcism attempt blocked'],
-  ['s-evil','ritual complete — package deployed'],
-  ['s-ok','entropy pool: sufficient'],
-  ['s-err','suspicious packet — banished'],
-  ['s-ok','matrix render stable — 60fps'],
-];
-var logIdx = 0;
-
-function logActivity(cls, msg) {
-  var log = document.getElementById('act-log');
-  if (!log) return;
-  var d = document.createElement('div');
-  d.innerHTML = '<span class="' + cls + '">[!]</span> ' + msg;
-  d.style.cssText = 'opacity:0;transition:opacity .4s';
-  log.insertBefore(d, log.firstChild);
-  setTimeout(function () { d.style.opacity = '1'; }, 40);
-  if (log.children.length > 8) log.removeChild(log.lastChild);
+/* ── CONTACT FORM (hardened: length limits + sanitization) ── */
+function handleForm(e) {
+  e.preventDefault();
+  // Sanitize: strip control chars, limit length
+  const sanitize = (s, max) => s.trim().replace(/[\x00-\x1F\x7F]/g, '').slice(0, max);
+  const n   = sanitize(document.getElementById('name').value, 80);
+  const em  = sanitize(document.getElementById('email').value, 120);
+  const msg = sanitize(document.getElementById('message').value, 1000);
+  if (!n || !em || !msg) return;
+  // Validate email format before proceeding
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) {
+    alert('please enter a valid email address.');
+    return;
+  }
+  const sub  = encodeURIComponent('Portfolio contact from ' + n);
+  const body = encodeURIComponent('Name: ' + n + '\nEmail: ' + em + '\n\n' + msg);
+  window.location.href = 'mailto:demonbazillionz@gmail.com?subject=' + sub + '&body=' + body;
 }
 
-setInterval(function () {
-  var e = logPool[logIdx++ % logPool.length];
-  logActivity(e[0], e[1]);
+/* ── ACTIVITY LOG (XSS-safe: no innerHTML for dynamic content) ── */
+const logPool = [
+  ['t-evil', 'daemon heartbeat — still alive'],
+  ['t-warn', 'port scan detected — logged'],
+  ['t-ok',   'checksum verified — all clear'],
+  ['t-err',  'exorcism attempt blocked'],
+  ['t-evil', 'ritual complete — package deployed'],
+  ['t-warn', 'anomalous ua string flagged'],
+  ['t-ok',   'entropy pool: sufficient'],
+  ['t-err',  'suspicious packet — banished'],
+  ['t-ok',   'matrix render stable — 60fps'],
+];
+let logIdx = 0;
+setInterval(() => {
+  const log = document.getElementById('activity-log');
+  if (!log) return;
+  const e = logPool[logIdx++ % logPool.length];
+  const d = document.createElement('div');
+  d.style.cssText = 'opacity:0;transition:opacity 0.4s';
+  // Safe DOM construction — no innerHTML with dynamic data
+  const badge = document.createElement('span');
+  badge.className = e[0];
+  badge.textContent = '[!]';
+  const msg = document.createTextNode(' ' + e[1]);
+  d.appendChild(badge);
+  d.appendChild(msg);
+  log.prepend(d);
+  setTimeout(() => d.style.opacity = '1', 40);
+  if (log.children.length > 8) log.removeChild(log.lastChild);
 }, 4000);
 
-/* ── Panel entry animations ── */
+/* ── PANEL ENTRY ANIMATIONS ── */
 (function () {
-  var panels = document.querySelectorAll('.panel');
-  var obs = new IntersectionObserver(function (entries) {
-    entries.forEach(function (en) {
+  const panels = document.querySelectorAll('.panel');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(en => {
       if (en.isIntersecting) {
         en.target.style.opacity = '1';
         en.target.style.transform = 'translateY(0)';
         obs.unobserve(en.target);
       }
     });
-  }, { threshold: .06 });
-  panels.forEach(function (p, i) {
-    p.style.cssText += ';opacity:0;transform:translateY(18px);transition:opacity .45s ease ' + (i*.06) + 's,transform .45s ease ' + (i*.06) + 's';
+  }, { threshold: 0.06 });
+  panels.forEach((p, i) => {
+    p.style.cssText += `;opacity:0;transform:translateY(18px);transition:opacity 0.45s ease ${i*0.06}s,transform 0.45s ease ${i*0.06}s`;
     obs.observe(p);
   });
-})();
-
-/* ════════════════════════════════════════
-   ★ UPDATE TOAST ★
-   Called by SW message listener in <head>
-   when a new service worker activates.
-════════════════════════════════════════ */
-function showUpdateToast(version) {
-  var toast = document.getElementById('update-toast');
-  var ver   = document.getElementById('toast-ver');
-  var cd    = document.getElementById('toast-cd');
-  var bar   = document.getElementById('toast-bar');
-  if (!toast) return;
-
-  if (ver) ver.textContent = version || 'new';
-  toast.classList.remove('hide');
-  toast.classList.add('show');
-
-  // Start countdown bar animation
-  bar.classList.remove('drain');
-  void bar.offsetWidth;
-  bar.classList.add('drain');
-
-  // Countdown number
-  var n = 3;
-  cd.textContent = n;
-  var iv = setInterval(function () {
-    n--;
-    cd.textContent = n;
-    if (n <= 0) { clearInterval(iv); doReload(); }
-  }, 1000);
-
-  document.getElementById('toast-now').onclick = function () {
-    clearInterval(iv); doReload();
-  };
-  document.getElementById('toast-later').onclick = function () {
-    clearInterval(iv);
-    toast.classList.add('hide');
-    setTimeout(function () { toast.classList.remove('show','hide'); }, 500);
-    logActivity('s-warn', 'update deferred — refresh to apply');
-  };
-
-  logActivity('s-ok', 'daemon updated to ' + version);
-}
-
-function doReload() {
-  var toast = document.getElementById('update-toast');
-  if (toast) toast.classList.remove('show');
-  setTimeout(function () { window.location.reload(true); }, 300);
-}
-
-// If SW message arrived before DOM ready
-if (window._pendingUpdate) showUpdateToast(window._pendingUpdate);
-
-/* ════════════════════════════════════════
-   ★ INSTALL SYSTEM ★
-
-   Rules:
-   1. NEVER auto-show any popup
-   2. FAB button shows after boot (user sees it)
-   3. User taps FAB or footer link → modal opens
-   4. Modal auto-selects correct browser tab
-   5. If beforeinstallprompt captured → show
-      one-tap install button inside modal
-   6. When installed → hide all install UI
-════════════════════════════════════════ */
-(function () {
-
-  var deferredPrompt = null;
-  var modal   = document.getElementById('install-modal');
-  var fab     = document.getElementById('install-fab');
-  var footBtn = document.getElementById('footer-install');
-  var onetap  = document.getElementById('im-onetap');
-  var imClose = document.getElementById('im-close');
-  var backdrop= document.getElementById('im-backdrop');
-  var tabs    = document.querySelectorAll('.im-tab');
-  var steps   = document.querySelectorAll('.im-steps');
-  var pwaStatus = document.getElementById('pwa-st');
-  var swStatus  = document.getElementById('sw-st');
-
-  /* ── Is already installed? ── */
-  var installed = (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true
-  );
-
-  if (installed) {
-    if (pwaStatus) { pwaStatus.textContent = 'installed'; pwaStatus.style.color = 'var(--green)'; }
-    // Already installed — hide all install UI, done
-    return;
-  }
-
-  /* ── Detect browser ── */
-  var ua = navigator.userAgent.toLowerCase();
-  var browser = 'chrome'; // default
-  if (/iphone|ipad|ipod/.test(ua) && !/crios|fxios/.test(ua)) browser = 'safari';
-  else if (/brave/.test(ua) || (navigator.brave && navigator.brave.isBrave)) browser = 'brave';
-  else if (/edg\//.test(ua)) browser = 'edge';
-  else if (/samsungbrowser/.test(ua)) browser = 'samsung';
-  else if (/firefox/.test(ua)) browser = 'firefox';
-
-  /* ── Tab switching ── */
-  function switchTab(name) {
-    tabs.forEach(function (t) { t.classList.toggle('on', t.dataset.b === name); });
-    steps.forEach(function (s) { s.classList.toggle('on', s.id === 'b-' + name); });
-  }
-
-  tabs.forEach(function (t) {
-    t.addEventListener('click', function () { switchTab(t.dataset.b); });
-  });
-
-  /* ── Open modal ── */
-  function openModal() {
-    switchTab(browser);
-    onetap.classList.toggle('show', !!deferredPrompt);
-    modal.classList.add('open');
-    logActivity('s-warn', 'install guide opened');
-  }
-
-  /* ── Close modal ── */
-  function closeModal() {
-    modal.classList.remove('open');
-  }
-
-  imClose.addEventListener('click', closeModal);
-  backdrop.addEventListener('click', closeModal);
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeModal();
-  });
-
-  /* ── One-tap install inside modal ── */
-  onetap.addEventListener('click', function () {
-    if (!deferredPrompt) return;
-    closeModal();
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(function (r) {
-      if (r.outcome === 'accepted') onInstalled();
-      deferredPrompt = null;
-    });
-  });
-
-  /* ── FAB and footer button open the modal ── */
-  fab.addEventListener('click', openModal);
-  footBtn.addEventListener('click', openModal);
-
-  /* ── Show FAB after boot screen clears ── */
-  /* No auto-popup. Just show the button. */
-  setTimeout(function () {
-    fab.classList.add('show');
-    footBtn.classList.add('show');
-  }, 3200);
-
-  /* ── Capture beforeinstallprompt ── */
-  /* This fires on Chrome/Edge/Android when PWA criteria met.
-     We capture it silently and use it in the modal.
-     We do NOT auto-show any prompt. */
-  window.addEventListener('beforeinstallprompt', function (e) {
-    e.preventDefault();
-    deferredPrompt = e;
-    onetap.classList.add('show'); // activate one-tap in modal
-    logActivity('s-ok', 'install ready — tap ⬇ button to install');
-    if (pwaStatus) { pwaStatus.textContent = 'installable'; pwaStatus.style.color = 'var(--amber)'; }
-  });
-
-  /* ── After install completes ── */
-  window.addEventListener('appinstalled', function () { onInstalled(); });
-
-  function onInstalled() {
-    fab.classList.remove('show');
-    footBtn.classList.remove('show');
-    closeModal();
-    if (pwaStatus) { pwaStatus.textContent = 'installed'; pwaStatus.style.color = 'var(--green)'; }
-    logActivity('s-ok', 'pwa installed — real app, works offline');
-    deferredPrompt = null;
-  }
-
-  /* ── SW status ── */
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.ready.then(function () {
-      if (swStatus) { swStatus.textContent = 'active'; swStatus.style.color = 'var(--green)'; }
-      logActivity('s-ok', 'service worker v6 active');
-    });
-  }
-
 })();
 </script>
 
