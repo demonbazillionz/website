@@ -4,15 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>demonbazillionz // personal homepage</title>
-
-  <link rel="manifest" href="/demonbazillionz/manifest.json">
-  <meta name="theme-color" content="#000080">
-
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#08088F">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="demonbazillionz">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
 
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("service-worker.js?v=2");
+        navigator.serviceWorker.register("sw.js").catch(() => {});
       });
     }
   </script>
@@ -166,24 +170,6 @@
       margin: 7px 0;
     }
 
-    .layout {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 10px;
-    }
-
-    .layout td {
-      vertical-align: top;
-    }
-
-    .main-col {
-      width: 68%;
-    }
-
-    .side-col {
-      width: 32%;
-    }
-
     .about-table {
       width: 100%;
       border-collapse: collapse;
@@ -312,24 +298,25 @@
         box-shadow: 4px 4px 0 #000000;
       }
 
-      .layout,
-      .layout tbody,
-      .layout tr,
-      .layout td {
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .nav a {
+        margin-right: 10px;
+        font-size: 12px;
+      }
+
+      .about-table,
+      .about-table tbody,
+      .about-table tr,
+      .about-table td {
         display: block;
         width: auto;
       }
 
-      .layout {
-        margin: 0;
-      }
-
-      .layout td {
-        margin-bottom: 10px;
-      }
-
-      .header h1 {
-        font-size: 24px;
+      .avatar {
+        margin: 0 auto 10px;
       }
     }
   </style>
@@ -339,10 +326,9 @@
   <div class="page">
 
     <div class="topbar">
-
     </div>
 
-    <header class="header">
+    <header class="header" id="home">
       <h1>demonbazillionz</h1>
       <p>Reverse engineering &middot; Cybersecurity &middot; Software &middot; Web</p>
     </header>
@@ -356,11 +342,10 @@
     </nav>
 
     <div class="notice">
-      <span class="title">" Welcome to 
-       my little corner of the Internet! "
+      * Welcome to my little corner of the Internet! *
     </div>
 
-    <div class="content" id="home">
+    <div class="content">
 
       <div class="hero">
         <h2>&gt; Hello, Internet!</h2>
@@ -375,143 +360,125 @@
         </p>
       </div>
 
-      <table class="layout">
-        <tr>
-          <td class="main-col">
-
-            <div class="window-title">
-            <span class="blink">/home/aboutme</span>
-            </div>
-
-                <table class="about-table">
-                  <tr>
-                    <td style="width:130px;">
-                      <div class="avatar">
-                        <img src="https://i.ibb.co/39F2XkQs/demonbazillionz.png"
-                             alt="demonbazillionz">
-                      </div>
-                    </td>
-
-                    <td>
-                      <h2 class="section-title">whoami</h2>
-
-                      <p>
-                        I'm demonbazillionz, A passionate Computer Science &amp; Engineering student.
-                        I focus on software development, web design, cyber
-                        cr*me, and video editing, aiming to create impactful
-                        and efficient digital solutions that bridge creativity
-                        with technology.
-                      </p>
-                      
-                    </td>
-                  </tr>
-                </table>
-
-                <hr>
-
-                <p>
-                  I focus on learning practical security: editing apps,
-                  exploring embedded systems, and building small web &amp;
-                  mobile projects. I believe in ethical research and using
-                  skills to help organizations improve.
-                </p>
-
-              </div>
-            </section>
-
-            <section class="window" id="education">
-            <div class="window-title">
-            <span class="blink">/home/educationandlearning</span>
-            </div>
-              <div class="window-body">
-                <h2 class="section-title">Learning</h2>
-                <p>
-                  Diploma in Computer Science &amp; Engineering with a
-                  strong interest in technology and practical computing.
-                </p>
-                <p>
-                  <b>Current focus:</b>
-                  <font color="green">Cybersecurity</font>
-                </p>
-                <p>
-                  <b>Core skill:</b> Linux &amp; System Administration
-                </p>
-              </div>
-            </section>
-
-            <section class="window" id="projects">
-              <div class="window-title">
-  <span class="blink">/home/projects</span>
-</div>
-              <div class="window-body">
-
-                <div class="project">
-                  <h4>aqora</h4>
-                  
-                  <a href="https://github.com/demonbazillionz/aqora"
-                     target="_blank" rel="noopener">
-                    [ OPEN PROJECT ]
-                  </a>
+      <section class="window" id="about">
+        <div class="window-title">
+          <span class="blink">/home/aboutme</span>
+        </div>
+        <div class="window-body">
+          <table class="about-table">
+            <tr>
+              <td style="width:130px;">
+                <div class="avatar">
+                  <img src="https://i.ibb.co/39F2XkQs/demonbazillionz.png"
+                       alt="demonbazillionz">
                 </div>
+              </td>
+              <td>
+                <h2 class="section-title">whoami</h2>
+                <p>
+                  I'm demonbazillionz, A passionate Computer Science &amp; Engineering student.
+                  I focus on software development, web design, cyber
+                  cr*me, and video editing, aiming to create impactful
+                  and efficient digital solutions that bridge creativity
+                  with technology.
+                </p>
+              </td>
+            </tr>
+          </table>
 
-                <div class="project">
-                  <h4>StretchSquare</h4>
-                  
-                  <a href="https://github.com/demonbazillionz/StretchSquare"
-                     target="_blank" rel="noopener">
-                    [ OPEN PROJECT ]
-                  </a>
-                </div>
+          <hr>
 
-                <div class="project">
-                  <h4>Sysora</h4>
-                  
-                  <a href="https://github.com/demonbazillionz/Sysora"
-                     target="_blank" rel="noopener">
-                    [ OPEN PROJECT ]
-                  </a>
-                </div>
+          <p>
+            I focus on learning practical security; editing apps,
+            exploring embedded systems, and building small web &amp;
+            mobile projects. I believe in ethical research and using
+            skills to help organizations improve.
+          </p>
+        </div>
+      </section>
 
-              </div>
-            </section>
+      <section class="window" id="education">
+        <div class="window-title">
+          <span class="blink">/home/educationandlearning</span>
+        </div>
+        <div class="window-body">
+          <h2 class="section-title">Learning</h2>
+          <p>
+            Diploma in Computer Science &amp; Engineering with a
+            strong interest in technology and practical computing.
+          </p>
+          <p>
+            <b>Current focus:</b>
+            <font color="green">Cybersecurity</font>
+          </p>
+          <p>
+            <b>Core skill:</b> Linux &amp; System Administration
+          </p>
+        </div>
+      </section>
 
-            <section class="window" id="connections">
-              <div class="window-title">
-  <span class="blink">/home/connections</span>
-</div>
-              <div class="window-body">
+      <section class="window" id="projects">
+        <div class="window-title">
+          <span class="blink">/home/projects</span>
+        </div>
+        <div class="window-body">
 
-                <p>Let's connect!!!</p>
+          <div class="project">
+            <h4>aqora</h4>
+            <a href="https://github.com/demonbazillionz/aqora"
+               target="_blank" rel="noopener">
+              [ OPEN PROJECT ]
+            </a>
+          </div>
 
-                <ul class="sidebar-list">
-                  <li>
-                    <a href="https://open.spotify.com/user/316c6a2x4wtcd6xbfp2h6skz4u4e?si=E2XMXVbUSfOvyk1oXBeUKw&utm_source=whatsapp"
-                       target="_blank" rel="noopener noreferrer">Spotify</a>
-                  </li>
-                  <li>
-                    <a href="https://github.com/demonbazillionz"
-                       target="_blank" rel="noopener">GitHub</a>
-                  </li>
-                  <li>
-                    <a href="https://www.tiktok.com/@demonbazillionz?_r=1&_t=ZS-98M81Vxbrow"
-                       target="_blank" rel="noopener">TikTok</a>
-                  </li>
-                  <li>
-                    <a href="https://www.linkedin.com/in/demonbazillionz/"
-                       target="_blank" rel="noopener">LinkedIn</a>
-                  </li>
-                </ul>
+          <div class="project">
+            <h4>StretchSquare</h4>
+            <a href="https://github.com/demonbazillionz/StretchSquare"
+               target="_blank" rel="noopener">
+              [ OPEN PROJECT ]
+            </a>
+          </div>
 
-              </div>
-            </section>
+          <div class="project">
+            <h4>Sysora</h4>
+            <a href="https://github.com/demonbazillionz/Sysora"
+               target="_blank" rel="noopener">
+              [ OPEN PROJECT ]
+            </a>
+          </div>
 
-          </td>
+        </div>
+      </section>
 
-          <td class="side-col">
+      <section class="window" id="connections">
+        <div class="window-title">
+          <span class="blink">/home/connections</span>
+        </div>
+        <div class="window-body">
 
-          </td>
-        </tr>
-      </table>
+          <p><b>Let's connect!!!</b></p>
+
+          <ul class="sidebar-list">
+            <li>
+              <a href="https://open.spotify.com/user/316c6a2x4wtcd6xbfp2h6skz4u4e?si=E2XMXVbUSfOvyk1oXBeUKw&utm_source=whatsapp"
+                 target="_blank" rel="noopener noreferrer">Spotify</a>
+            </li>
+            <li>
+              <a href="https://github.com/demonbazillionz"
+                 target="_blank" rel="noopener">GitHub</a>
+            </li>
+            <li>
+              <a href="https://www.tiktok.com/@demonbazillionz?_r=1&_t=ZS-98M81Vxbrow"
+                 target="_blank" rel="noopener">TikTok</a>
+            </li>
+            <li>
+              <a href="https://www.linkedin.com/in/demonbazillionz/"
+                 target="_blank" rel="noopener">LinkedIn</a>
+            </li>
+          </ul>
+
+        </div>
+      </section>
 
     </div>
 
@@ -522,10 +489,9 @@
       <br>
       <span class="tiny">
         Certain information provided here may be fictional, intended
-            solely for educational and experimental purposes.
+        solely for educational and experimental purposes.
       </span>
-      <br><br>
-      <span class="tiny">
+    </footer>
 
   </div>
 </body>
