@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>demonbazillionz // personal homepage</title>
+
+  <link rel="manifest" href="/demonbazillionz/manifest.json">
+  <meta name="theme-color" content="#000080">
+
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("service-worker.js?v=2");
+      });
+    }
+  </script>
+
+  <style>
+    /* =========================================================
+       OLD INTERNET / 1998-2003 PERSONAL HOMEPAGE THEME
+       ========================================================= */
+
+    html {
+      background: #000000;
+    }
+
+    body {
+      margin: 0;
+      padding: 18px 8px 30px;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          #d6d6d6 0px,
+          #d6d6d6 1px,
+          #eeeeee 1px,
+          #eeeeee 2px
+        );
+      color: #000000;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 16px;
+      line-height: 1.35;
+    }
+
+    a {
+      color: #0000ee;
+      text-decoration: underline;
+    }
+
+    a:visited {
+      color: #551a8b;
+    }
+
+    a:hover {
+      color: #ff0000;
+      background: #ffff00;
+    }
+
+    .page {
+      width: 780px;
+      max-width: calc(100% - 16px);
+      margin: 0 auto;
+      background: #ffffff;
+      border: 3px ridge #808080;
+      box-shadow: 8px 8px 0 #000000;
+    }
+
+    .topbar {
+      background: #000080;
+      color: #ffffff;
+      padding: 5px 8px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      border-bottom: 2px solid #c0c0c0;
+    }
+
+    .header {
+      padding: 10px 14px;
+      background: #c0c0c0;
+      border-bottom: 3px ridge #ffffff;
+    }
+
+    .header h1 {
+      margin: 0;
+      color: #000080;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 32px;
+      text-shadow: 2px 2px #ffffff;
+    }
+
+    .header p {
+      margin: 3px 0 0;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13px;
+      color: #000000;
+    }
+
+    .nav {
+      background: #000000;
+      padding: 5px 8px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13px;
+      border-bottom: 2px solid #808080;
+    }
+
+    .nav a {
+      color: #ffffff;
+      margin-right: 18px;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .nav a:hover {
+      color: #000000;
+      background: #ffff00;
+    }
+
+    .notice {
+      margin: 10px 12px;
+      padding: 4px 8px;
+      background: #ffff00;
+      border: 2px solid #000000;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .content {
+      padding: 0 12px 12px;
+    }
+
+    .window {
+      margin-top: 12px;
+      border: 2px outset #c0c0c0;
+      background: #ffffff;
+    }
+
+    .window-title {
+      padding: 3px 6px;
+      background: #000080;
+      color: #ffffff;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .window-body {
+      padding: 10px;
+    }
+
+    .hero {
+      background: #e8e8ff;
+      border: 2px inset #c0c0c0;
+      padding: 10px;
+    }
+
+    .hero h2 {
+      margin: 0 0 6px;
+      color: #000080;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 23px;
+    }
+
+    .hero p {
+      margin: 7px 0;
+    }
+
+    .layout {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 10px;
+    }
+
+    .layout td {
+      vertical-align: top;
+    }
+
+    .main-col {
+      width: 68%;
+    }
+
+    .side-col {
+      width: 32%;
+    }
+
+    .about-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .about-table td {
+      vertical-align: top;
+      padding: 4px;
+    }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border: 3px ridge #808080;
+      background: #000000;
+      text-align: center;
+    }
+
+    .avatar img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .section-title {
+      color: #000080;
+      font-size: 20px;
+      margin: 0 0 5px;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .skills {
+      margin: 8px 0 0;
+      padding-left: 20px;
+    }
+
+    .skills li {
+      margin: 2px 0;
+    }
+
+    .skill {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .project {
+      margin: 7px 0;
+      padding: 7px;
+      background: #eeeeee;
+      border: 2px outset #c0c0c0;
+    }
+
+    .project h4 {
+      margin: 0 0 3px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .sidebar-list {
+      margin: 5px 0;
+      padding-left: 18px;
+    }
+
+    .counter {
+      display: inline-block;
+      padding: 2px 5px;
+      background: #000000;
+      color: #00ff00;
+      border: 2px inset #808080;
+      font-family: "Courier New", monospace;
+      letter-spacing: 2px;
+    }
+
+    .webring {
+      text-align: center;
+      padding: 8px;
+      background: #ffffcc;
+      border: 1px dashed #000000;
+      font-size: 13px;
+    }
+
+    .footer {
+      margin-top: 12px;
+      padding: 10px;
+      background: #c0c0c0;
+      border-top: 3px ridge #ffffff;
+      text-align: center;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+    }
+
+    .footer h3 {
+      margin: 0 0 4px;
+      font-family: "Courier New", monospace;
+      color: #000080;
+    }
+
+    .tiny {
+      font-size: 11px;
+    }
+
+    .blink {
+      animation: blink 1s steps(2, start) infinite;
+    }
+
+    @keyframes blink {
+      50% { visibility: hidden; }
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid #000000;
+      border-bottom: 1px solid #ffffff;
+      height: 2px;
+    }
+
+    @media (max-width: 800px) {
+      body {
+        padding: 4px;
+      }
+
+      .page {
+        max-width: 100%;
+        width: 100%;
+        box-shadow: 4px 4px 0 #000000;
+      }
+
+      .layout,
+      .layout tbody,
+      .layout tr,
+      .layout td {
+        display: block;
+        width: auto;
+      }
+
+      .layout {
+        margin: 0;
+      }
+
+      .layout td {
+        margin-bottom: 10px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <div class="topbar">
+
+    </div>
+
+    <header class="header">
+      <h1>demonbazillionz</h1>
+      <p>Reverse engineering &middot; Cybersecurity &middot; Software &middot; Web</p>
+    </header>
+
+    <nav class="nav">
+      <a href="#home">[HOME]</a>
+      <a href="#about">[ABOUT]</a>
+      <a href="#education">[LEARNING]</a>
+      <a href="#connections">[CONNECTIONS]</a>
+      <a href="#projects">[PROJECTS]</a>
+    </nav>
+
+    <div class="notice">
+      <span class="title">" Welcome to 
+       my little corner of the Internet! "
+    </div>
+
+    <div class="content" id="home">
+
+      <div class="hero">
+        <h2>&gt; Hello, Internet!</h2>
+        <p>
+          Welcome to <b>demonbazillionz</b> — a personal homepage dedicated to
+          cybersecurity, reverse engineering, mobile app modding, software,
+          web projects and learning-by-doing.
+        </p>
+        <p>
+          <b>Current status:</b>
+          <font color="red">probably hacking something</font>
+        </p>
+      </div>
+
+      <table class="layout">
+        <tr>
+          <td class="main-col">
+
+            <div class="window-title">
+            <span class="blink">/home/aboutme</span>
+            </div>
+
+                <table class="about-table">
+                  <tr>
+                    <td style="width:130px;">
+                      <div class="avatar">
+                        <img src="https://i.ibb.co/39F2XkQs/demonbazillionz.png"
+                             alt="demonbazillionz">
+                      </div>
+                    </td>
+
+                    <td>
+                      <h2 class="section-title">whoami</h2>
+
+                      <p>
+                        I'm demonbazillionz, A passionate Computer Science &amp; Engineering student.
+                        I focus on software development, web design, cyber
+                        cr*me, and video editing, aiming to create impactful
+                        and efficient digital solutions that bridge creativity
+                        with technology.
+                      </p>
+                      
+                    </td>
+                  </tr>
+                </table>
+
+                <hr>
+
+                <p>
+                  I focus on learning practical security: editing apps,
+                  exploring embedded systems, and building small web &amp;
+                  mobile projects. I believe in ethical research and using
+                  skills to help organizations improve.
+                </p>
+
+              </div>
+            </section>
+
+            <section class="window" id="education">
+            <div class="window-title">
+            <span class="blink">/home/educationandlearning</span>
+            </div>
+              <div class="window-body">
+                <h2 class="section-title">Learning</h2>
+                <p>
+                  Diploma in Computer Science &amp; Engineering with a
+                  strong interest in technology and practical computing.
+                </p>
+                <p>
+                  <b>Current focus:</b>
+                  <font color="green">Cybersecurity</font>
+                </p>
+                <p>
+                  <b>Core skill:</b> Linux &amp; System Administration
+                </p>
+              </div>
+            </section>
+
+            <section class="window" id="projects">
+              <div class="window-title">
+  <span class="blink">/home/projects</span>
+</div>
+              <div class="window-body">
+
+                <div class="project">
+                  <h4>dailyhydra</h4>
+                  
+                  <a href="https://github.com/demonbazillionz/dailyhydra"
+                     target="_blank" rel="noopener">
+                    [ OPEN PROJECT ]
+                  </a>
+                </div>
+
+                <div class="project">
+                  <h4>StretchSquare</h4>
+                  
+                  <a href="https://github.com/demonbazillionz/StretchSquare"
+                     target="_blank" rel="noopener">
+                    [ OPEN PROJECT ]
+                  </a>
+                </div>
+
+                <div class="project">
+                  <h4>Sysora</h4>
+                  
+                  <a href="https://github.com/demonbazillionz/Sysora"
+                     target="_blank" rel="noopener">
+                    [ OPEN PROJECT ]
+                  </a>
+                </div>
+
+              </div>
+            </section>
+
+            <section class="window" id="connections">
+              <div class="window-title">
+  <span class="blink">/home/connections</span>
+</div>
+              <div class="window-body">
+
+                <p>Let's connect!!!</p>
+
+                <ul class="sidebar-list">
+                  <li>
+                    <a href="https://open.spotify.com/user/316c6a2x4wtcd6xbfp2h6skz4u4e?si=E2XMXVbUSfOvyk1oXBeUKw&utm_source=whatsapp"
+                       target="_blank" rel="noopener noreferrer">Spotify</a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/demonbazillionz"
+                       target="_blank" rel="noopener">GitHub</a>
+                  </li>
+                  <li>
+                    <a href="https://www.tiktok.com/@demonbazillionz?_r=1&_t=ZS-98M81Vxbrow"
+                       target="_blank" rel="noopener">TikTok</a>
+                  </li>
+                  <li>
+                    <a href="https://www.linkedin.com/in/demonbazillionz/"
+                       target="_blank" rel="noopener">LinkedIn</a>
+                  </li>
+                </ul>
+
+              </div>
+            </section>
+
+          </td>
+
+          <td class="side-col">
+
+        
+
+           
+            <section class="window">
+              <div class="window-title">
+  <span class="blink">/home/links</span>
+</div>
+              <div class="window-body">
+                <ul class="sidebar-list">
+                  <li><a href="https://github.com/demonbazillionz" target="_blank" rel="noopener">My GitHub</a></li>
+                  <li><a href="#projects">My Projects</a></li>
+                  <li><a href="#about">About Me</a></li>
+                  <li><a href="#connect">Social Links</a></li>
+                </ul>
+              </div>
+            </section>
+
+          </td>
+        </tr>
+      </table>
+
+    </div>
+
+    <footer class="footer">
+      <h3>demonbazillionz</h3>
+      &copy; <b>demonbazillionz</b> &bull;
+      Built for learning &amp; responsible research
+      <br>
+      <span class="tiny">
+        Certain information provided here may be fictional, intended
+            solely for educational and experimental purposes.
+      </span>
+      <br><br>
+      <span class="tiny">
+
+  </div>
+</body>
+</html>
